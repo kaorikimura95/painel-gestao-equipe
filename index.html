@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="pt-pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DSV 2026 - Painel de Gestão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+        body { font-family: 'Open Sans', sans-serif; }
+        
+        .h-dvh { height: 100dvh; }
+
+        /* Modal e Scrollbars */
+        #projectModal, #indicatorModal { 
+            display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); 
+        }
+        .modal-container { max-height: 80vh; overflow-y: auto; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        nav::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        nav::-webkit-scrollbar-track { background: transparent; }
+
+        /* Campos de Formulário */
+        .field-label { display: block; font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.1em; }
+        .input-style { width: 100%; background-color: white; border: 1px solid #dbeafe; border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); appearance: none; color: #0f172a; font-weight: 400; }
+        .input-style:focus { box-shadow: 0 0 0 2px #3b82f6; border-color: transparent; }
+
+        .tag-container { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem 1rem; border: 1px solid #dbeafe; border-radius: 0.75rem; min-height: 44px; transition: all 0.2s; cursor: text; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); background-color: #ffffff !important; align-items: center; }
+        .tag-container:focus-within { box-shadow: 0 0 0 2px #3b82f6; }
+
+        .actor-tag { background-color: #dbeafe; color: #1d4ed8; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 0.375rem; display: flex; align-items: center; gap: 0.5rem; border: 1px solid #bfdbfe; }
+        .form-section-title { display: flex; align-items: center; gap: 0.5rem; color: #1e293b; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
+        .doc-link-container { display: flex; align-items: center; justify-content: center; border: 2px dashed #bfdbfe; border-radius: 0.75rem; padding: 0.75rem; background-color: rgba(239, 246, 255, 0.3); transition: all 0.2s; cursor: pointer; color: #3b82f6; font-weight: 700; font-size: 0.75rem; gap: 0.75rem; }
+        .doc-link-container:hover { background-color: #eff6ff; border-color: #60a5fa; }
+        .hidden-field { display: none !important; }
+
+        .radio-group { display: flex; gap: 1rem; padding: 0.75rem; background-color: white; border: 1px solid #dbeafe; border-radius: 0.75rem; }
+        .radio-option { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: #334155; }
+
+        /* Botões de Abas */
+        .tab-btn { color: #94a3b8; transition: all 0.2s; }
+        .tab-btn:hover { background-color: #1e293b; color: white; }
+        
+        .btn-theme-project { color: #94a3b8; } .btn-theme-project:hover { color: #2563eb; border-color: #93c5fd; }
+        .btn-theme-contract { color: #94a3b8; } .btn-theme-contract:hover { color: #9333ea; border-color: #d8b4fe; }
+        .btn-theme-operational { color: #94a3b8; } .btn-theme-operational:hover { color: #ea580c; border-color: #fdba74; }
+        .btn-theme-portaria { color: #94a3b8; } .btn-theme-portaria:hover { color: #0891b2; border-color: #67e8f9; }
+        .btn-theme-indicators { color: #94a3b8; } .btn-theme-indicators:hover { color: #be185d; border-color: #fbcfe8; }
+        .btn-theme-gantt { color: #94a3b8; } .btn-theme-gantt:hover { color: #059669; border-color: #6ee7b7; }
+
+        /* Acordeão */
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; }
+        .accordion-row.active .accordion-content { max-height: 3000px; padding-bottom: 2rem; }
+        .accordion-row.active .chevron-icon { transform: rotate(180deg); }
+
+        /* --- ESTILOS DA PORTARIA --- */
+        .portaria-card { background-color: white; border-width: 1px; border-style: solid; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: all 0.2s; position: relative; overflow: hidden; }
+        .portaria-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .portaria-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        
+        /* Tipos de Portaria */
+        .type-diretoria { border-color: #e2e8f0; } .type-diretoria::before { background-color: #1e293b; }
+        .badge-diretoria { background-color: #f1f5f9; color: #1e293b; border: 1px solid #e2e8f0; }
+        
+        .type-coordenadoria { border-color: #dbeafe; } .type-coordenadoria::before { background-color: #3b82f6; }
+        .badge-coordenadoria { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+        
+        .type-divisao { border-color: #e0e7ff; } .type-divisao::before { background-color: #6366f1; }
+        .badge-divisao { background-color: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; }
+        
+        .type-servico { border-color: #f1f5f9; } .type-servico::before { background-color: #cbd5e1; }
+        .badge-servico { background-color: #f8fafc; color: #64748b; border: 1px solid #f1f5f9; }
+
+        .portaria-badge { font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; letter-spacing: 0.05em; }
+
+        /* --- BOTÕES DE FILTRO DA PORTARIA (AUMENTADOS) --- */
+        .portaria-filter-btn {
+            height: 42px; /* Reduzido de 80px para 42px para ficar "mais fino" */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem; /* Ajuste sutil no raio da borda */
+            font-size: 11px; /* Fonte ajustada para a nova altura */
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom-width: 0;
+            opacity: 0.7;
+            cursor: pointer;
+            width: 100%;
+            filter: grayscale(80%);
+            transform: scale(0.98);
+        }
+
+        .portaria-filter-btn:hover { opacity: 1; filter: grayscale(0%); transform: scale(1); }
+
+        .portaria-filter-btn.active {
+            opacity: 1;
+            filter: grayscale(0%);
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 2px solid white;
+            outline: 2px solid currentColor;
+            outline-offset: 1px;
+        }
+
+        .filter-all { background-color: #475569; color: white; }
+        .filter-diretoria { background-color: #0f172a; color: white; }
+        .filter-coordenadoria { background-color: #2563eb; color: white; }
+        .filter-divisao { background-color: #7c3aed; color: white; }
+        .filter-servico { background-color: #059669; color: white; }
+
+        /* Calendário e Gráficos */
+        .calendar-new-wrapper { background-color: white; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden; }
+        .calendar-new-header { background-color: white; border-bottom: 1px solid #f1f5f9; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; gap: 0.75rem; }
+        .calendar-new-main { padding: 1rem; overflow-x: auto; display: flex; justify-content: center; }
+        #calendarGrid { min-height: 550px; min-width: 800px; }
+        
+        .calendar-new-day-cell { min-height: 120px; background-color: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; transition: all 0.2s; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; cursor: default; }
+        .calendar-new-day-cell:hover { border-color: #60a5fa; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .calendar-day-active { background-color: #eff6ff !important; border-color: #3b82f6 !important; box-shadow: inset 0 0 0 1px #3b82f6; }
+        .calendar-new-day-empty { min-height: 120px; background-color: #f8fafc; border: 1px solid transparent; border-radius: 0.5rem; }
+
+        .chart-pie { width: 100px; height: 100px; border-radius: 50%; transition: all 0.5s ease; }
+        
+        .stat-card { cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; min-height: 80px; display: flex; flex-direction: column; justify-content: center; }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
+        .stat-card.active-filter { box-shadow: 0 0 0 3px #60a5fa; border-color: transparent; background-color: #eff6ff; transform: scale(1.02); z-index: 10; }
+        .operational-theme .stat-card.active-filter { box-shadow: 0 0 0 3px #fb923c; background-color: #fff7ed; }
+        .contracts-theme .stat-card.active-filter { box-shadow: 0 0 0 3px #c084fc; background-color: #faf5ff; }
+        .portaria-theme .stat-card.active-filter { box-shadow: 0 0 0 3px #22d3ee; background-color: #ecfeff; }
+
+        .coord-btn { transition: all 0.3s ease; border: 1px solid transparent; opacity: 1; }
+        .coord-btn.active-coord { background-color: #2563eb !important; color: white !important; border-color: #60a5fa !important; box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.5) !important; transform: scale(1.1); opacity: 1 !important; z-index: 10; }
+        #coordBtnContainer.coord-list-active .coord-btn:not(.active-coord) { opacity: 0.4; filter: grayscale(100%); transform: scale(0.95); }
+        #coordBtnContainer.coord-list-active .coord-btn:not(.active-coord):hover { opacity: 1; filter: grayscale(0%); background-color: #1e293b; color: #cbd5e1; transform: scale(1); }
+        
+        /* Legenda como Botões */
+        .chart-legend-item { cursor: pointer; transition: all 0.2s; padding: 0.25rem 0.5rem; border-radius: 0.5rem; opacity: 0.5; filter: grayscale(100%); border: 1px solid transparent; }
+        .chart-legend-item:hover { opacity: 0.8; background-color: #f1f5f9; filter: grayscale(0); border-color: #cbd5e1; }
+        .chart-legend-item.active-legend { background-color: #eff6ff; border-color: #bfdbfe; font-weight: 900; opacity: 1; filter: grayscale(0); transform: scale(1.02); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .chart-legend-container:not(.has-filter) .chart-legend-item { opacity: 1; filter: grayscale(0); }
+
+        .legend-section-title { font-size: 0.875rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #1e293b; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .legend-item-title { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.25rem; display: flex; align-items: center; letter-spacing: -0.025em; }
+        .legend-item-desc { font-size: 10px; color: #64748b; line-height: 1.25; font-weight: 500; }
+        .legend-badge { display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 50%; margin-right: 0.75rem; flex-shrink: 0; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border: 1px solid rgba(0,0,0,0.05); }
+        
+        .responsive-stats-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
+        @media (min-width: 640px) { .responsive-stats-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1280px) { .responsive-stats-grid { grid-template-columns: repeat(5, 1fr); } }
+
+        /* Estilo Indicadores */
+        .indicator-card { background: white; border: 1px solid #fbcfe8; border-radius: 1rem; padding: 1.5rem; transition: all 0.2s; position: relative; overflow: hidden; }
+        .indicator-card:hover { box-shadow: 0 10px 15px -3px rgba(190, 24, 93, 0.1), 0 4px 6px -4px rgba(190, 24, 93, 0.1); border-color: #f9a8d4; transform: translateY(-2px); cursor: pointer; }
+        .indicator-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #be185d; }
+        .month-cell { background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 0.375rem; padding: 0.25rem; text-align: center; }
+        .month-label { font-size: 9px; font-weight: 900; color: #9d174d; text-transform: uppercase; margin-bottom: 2px; }
+        .month-value { font-size: 11px; font-bold; color: #831843; }
+        .progress-bg { background: #fce7f3; border-radius: 999px; height: 8px; width: 100%; overflow: hidden; margin-top: 0.5rem; }
+        .progress-fill { background: #db2777; height: 100%; border-radius: 999px; transition: width 0.5s ease-out; }
+        
+        /* Novo estilo para anos do PPA */
+        .ppa-year-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; text-align: center; }
+        .ppa-year-box.current { background-color: #fdf2f8; border-color: #fbcfe8; box-shadow: 0 0 0 1px #fbcfe8; }
+        .ppa-year-label { font-size: 10px; font-black; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+        .ppa-year-box.current .ppa-year-label { color: #be185d; }
+        .ppa-year-value { font-size: 12px; font-bold; color: #334155; }
+        .ppa-year-box.current .ppa-year-value { color: #be185d; }
+        .ppa-subtext { font-size: 9px; color: #94a3b8; margin-top: 2px; font-weight: 500; }
+
+        /* --- ESTILOS GANTT --- */
+        .gantt-container { overflow-x: auto; position: relative; border-radius: 1rem; background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
+        .gantt-header-wrapper { position: sticky; top: 0; z-index: 20; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
+        
+        /* Ajuste visual para separar Meses e Semanas */
+        .gantt-months-row { display: flex; border-bottom: 1px solid #cbd5e1; background-color: #fff; }
+        .gantt-month-cell { text-align: center; font-size: 11px; font-weight: 900; text-transform: uppercase; color: #1e293b; padding: 0.6rem 0; border-right: 1px solid #e2e8f0; background: white; }
+        
+        .gantt-weeks-row { display: flex; background-color: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
+        .gantt-week-cell { flex: 1; text-align: center; font-size: 9px; font-bold; color: #64748b; padding: 0.25rem 0; border-right: 1px solid #e2e8f0; min-width: 25px; }
+        .gantt-week-cell:nth-child(even) { background-color: #f8fafc; }
+        .gantt-week-cell.new-month-start { border-left: 1px solid #94a3b8; background-color: #eff6ff !important; color: #1e293b; }
+
+        /* Estilos dos Filtros Gantt */
+        .gantt-filter-btn { opacity: 0.6; filter: grayscale(100%); transition: all 0.2s; background: transparent; }
+        .gantt-filter-btn:hover { opacity: 0.8; filter: grayscale(50%); background: #f1f5f9; }
+        .gantt-filter-btn.active { opacity: 1; filter: grayscale(0%); background: white; box-shadow: 0 1px 2px rgba(0,0,0,0.1); font-weight: 800; transform: scale(1.02); }
+        .gantt-filter-btn.active.gantt-btn-proj { color: #2563eb; border: 1px solid #bfdbfe; }
+        .gantt-filter-btn.active.gantt-btn-contr { color: #9333ea; border: 1px solid #e9d5ff; }
+        .gantt-filter-btn.active.gantt-btn-oper { color: #ea580c; border: 1px solid #fed7aa; }
+
+        .gantt-body { position: relative; }
+        /* Estilo da Linha Principal (Pai) */
+        .gantt-body-row { display: flex; border-bottom: 1px solid #f1f5f9; align-items: center; position: relative; transition: background-color 0.2s; height: 48px; cursor: pointer; }
+        .gantt-body-row:hover { background-color: #f0f9ff; }
+        .gantt-body-row.expanded { background-color: #eff6ff; border-bottom: 1px solid #dbeafe; }
+        
+        /* Estilo das Linhas Filhas (Detalhes) */
+        .gantt-sub-rows-container { display: none; background-color: #f8fafc; box-shadow: inset 0 4px 6px -4px rgba(0,0,0,0.1); }
+        .gantt-sub-rows-container.open { display: block; animation: slideDown 0.3s ease-out; }
+        
+        .gantt-sub-row { display: flex; border-bottom: 1px solid #f1f5f9; align-items: center; height: 36px; }
+        .gantt-sub-row:hover { background-color: #f1f5f9; }
+
+        .gantt-label-col { width: 280px; flex-shrink: 0; padding: 0.5rem 1rem; font-size: 11px; font-weight: 600; color: #1e293b; border-right: 1px solid #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: inherit; position: sticky; left: 0; z-index: 15; box-shadow: 2px 0 5px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: center; }
+        
+        .sub-label-col { padding-left: 2.5rem !important; color: #64748b; font-size: 10px; font-weight: 500; border-left: 4px solid #3b82f6; }
+
+        .gantt-timeline-col { flex: 1; position: relative; height: 100%; display: flex; }
+        .gantt-grid-cell { flex: 1; border-right: 1px solid #f8fafc; height: 100%; min-width: 25px; }
+        .gantt-grid-cell.month-end { border-right: 1px solid #e2e8f0; }
+
+        /* Barra Pai (Resumo) */
+        .gantt-bar { position: absolute; height: 20px; top: 50%; transform: translateY(-50%); border-radius: 4px; font-size: 9px; color: white; display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap; padding: 0 6px; z-index: 5; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: all 0.2s; font-weight: 700; text-shadow: 0 1px 1px rgba(0,0,0,0.1); }
+        .gantt-bar:hover { height: 26px; z-index: 25; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        
+        /* Marco/Diamante (Detalhe) */
+        .gantt-milestone { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; top: 50%; transform: translateY(-50%) translateX(-50%) rotate(45deg); z-index: 10; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.15); border-radius: 2px; cursor: pointer; transition: transform 0.2s; }
+        .gantt-milestone:hover { transform: translateY(-50%) translateX(-50%) rotate(45deg) scale(1.5); z-index: 30; }
+        
+        .gantt-chevron { transition: transform 0.3s; margin-right: 8px; color: #94a3b8; }
+        .expanded .gantt-chevron { transform: rotate(90deg); color: #3b82f6; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .type-label { font-size: 8px; font-black; text-transform: uppercase; letter-spacing: 0.05em; padding: 1px 4px; border-radius: 4px; margin-bottom: 2px; display: inline-block; width: fit-content; }
+        .label-proj { background: #eff6ff; color: #2563eb; }
+        .label-contr { background: #faf5ff; color: #9333ea; }
+        .label-oper { background: #fff7ed; color: #ea580c; }
+    </style>
+</head>
+<body id="mainBody" class="bg-slate-50 text-slate-900 text-sm overflow-hidden">
+
+    <!-- Modal (Universal) -->
+    <div id="projectModal" class="items-center justify-center p-2 sm:p-4" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden border border-slate-200 flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+            <div class="px-4 sm:px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+                <div class="flex items-center space-x-3">
+                    <div id="modalIcon" class="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-blue-100 transition-colors">
+                        <i id="modalIconImg" class="fas fa-project-diagram text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" class="font-black text-slate-800 uppercase tracking-tight text-sm sm:text-base">Novo Registro</h3>
+                    </div>
+                </div>
+                <button onclick="toggleModal('projectModal')" class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center">
+                    <i class="fas fa-times text-base"></i>
+                </button>
+            </div>
+            <div class="modal-container flex-1 overflow-y-auto">
+                <form id="projectForm" class="p-4 md:p-8">
+                    <input type="hidden" id="editId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+                        <!-- Identificação -->
+                        <div class="space-y-8">
+                            <div class="bg-slate-50 p-4 sm:p-6 rounded-3xl border border-slate-100 space-y-5">
+                                <h4 class="form-section-title"><strong>01. Identificação</strong></h4>
+                                <div id="contractTypeField" class="flex flex-col hidden-field">
+                                    <label class="field-label">Tipo de Objeto</label>
+                                    <select id="projType" class="input-style"><option value="Contrato">Contrato</option><option value="Convênio">Convênio</option></select>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label id="labelName" class="field-label">Nome do Registro</label>
+                                    <input type="text" id="projName" required class="input-style">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="field-label">Descrição / Escopo</label>
+                                    <textarea id="projDesc" rows="3" class="input-style resize-none"></textarea>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="field-label">Observações Gerais</label>
+                                    <textarea id="projObs" rows="3" class="input-style resize-none" placeholder="Informações adicionais..."></textarea>
+                                </div>
+                                <div id="contractRelationWrapper" class="flex flex-col hidden-field space-y-3 pt-3 border-t border-slate-100">
+                                    <label class="field-label">Relação com Projeto?</label>
+                                    <div class="radio-group flex-col sm:flex-row">
+                                        <label class="radio-option"><input type="radio" name="contractRelType" value="nao" checked onclick="toggleContractRelInput()"> Não</label>
+                                        <label class="radio-option"><input type="radio" name="contractRelType" value="sim" onclick="toggleContractRelInput()"> Sim</label>
+                                    </div>
+                                </div>
+                                <div id="projectSelectWrapper" class="hidden-field animate-fade-in">
+                                    <label class="field-label">Qual projeto?</label>
+                                    <select id="projRelation" class="input-style"></select>
+                                </div>
+                                <div id="resourceLogicField" class="hidden-field space-y-3 pt-3 border-t border-slate-100">
+                                    <div class="flex flex-col"><label class="field-label">Repasse de recurso?</label><select id="projHasResource" class="input-style" onchange="toggleResourceInput()"><option value="Não">Não</option><option value="Sim">Sim</option></select></div>
+                                    <div id="resourceValueField" class="flex flex-col hidden-field"><label class="field-label">Valor (R$)</label><input type="text" id="projResourceValue" class="input-style text-emerald-600 font-bold" placeholder="0,00" oninput="this.value = this.value.replace(/[^0-9,.]/g, '')"></div>
+                                </div>
+                                <div id="relationalField" class="flex flex-col hidden-field space-y-3">
+                                    <label class="field-label">Origem</label>
+                                    <div class="radio-group flex-col sm:flex-row">
+                                        <label class="radio-option"><input type="radio" name="originType" value="pontual" checked onclick="toggleOriginInput()"> Pontual</label>
+                                        <label class="radio-option"><input type="radio" name="originType" value="projeto" onclick="toggleOriginInput()"> Projeto</label>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col" id="managerField">
+                                    <label id="labelManager" class="field-label">Gestor Responsável</label>
+                                    <input type="text" id="projManager" class="input-style">
+                                </div>
+                                <div class="flex flex-col" id="actorsField">
+                                    <label class="field-label">Atores</label>
+                                    <div class="tag-container bg-white" id="actorsTagContainer">
+                                        <input type="text" id="actorInput" class="bg-transparent outline-none text-sm font-normal flex-1 min-w-[120px] placeholder-slate-400" style="color: #0f172a;" placeholder="Digite + Enter ou Espaço">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Processos -->
+                        <div class="space-y-8">
+                            <div class="bg-slate-50 p-4 sm:p-6 rounded-3xl border border-slate-100 space-y-5">
+                                <h4 class="form-section-title"><strong>02. Processos e Prazos</strong></h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div id="priorityField" class="flex flex-col">
+                                        <label class="field-label">Prioridade</label>
+                                        <select id="projPriority" class="input-style"><option value="Urgente">Urgente</option><option value="Alta">Alta</option><option value="Média" selected>Média</option><option value="Baixa">Baixa</option></select>
+                                    </div>
+                                    <div class="flex flex-col" id="seiField">
+                                        <label class="field-label">Processo SEI</label>
+                                        <input type="text" id="projSei" class="input-style">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label id="labelPrazo" class="field-label">Prazo Final</label>
+                                        <input type="date" id="projPrazo" class="input-style">
+                                    </div>
+                                    <!-- NOVO CAMPO: DURAÇÃO (DIAS) -->
+                                    <div class="flex flex-col hidden-field" id="operationalDurationField">
+                                        <label class="field-label">Duração (Dias)</label>
+                                        <input type="number" id="projDuration" class="input-style" placeholder="Ex: 5" min="0">
+                                    </div>
+                                </div>
+                                <div class="flex flex-col" id="docsField">
+                                    <label class="field-label">Link Documentos</label>
+                                    <div class="doc-link-container" onclick="document.getElementById('projDocs').focus()">
+                                        <i class="fas fa-link"></i><input type="text" id="projDocs" class="bg-transparent outline-none flex-1 text-slate-600" placeholder="URL SharePoint/Drive">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 p-4 sm:p-6 rounded-3xl border border-slate-100 space-y-5">
+                                <h4 class="form-section-title"><strong>03. Acompanhamento</strong></h4>
+                                <div class="grid grid-cols-1 gap-5">
+                                    <div class="flex flex-col">
+                                        <label class="field-label">Coordenação</label>
+                                        <select id="projCoord" class="input-style"><option value="EPT">EPT</option><option value="CEC">CEC</option><option value="CET">CET</option><option value="CGSV">CGSV</option><option value="COST">COST</option><option value="CIST">CIST</option></select>
+                                    </div>
+                                    <div id="serviceField" class="flex flex-col hidden-field">
+                                        <label class="field-label">Serviço</label>
+                                        <select id="projService" class="input-style"><option value="SCCE">SCCE</option><option value="SDCG">SDCG</option><option value="SFP">SFP</option><option value="SIEDU">SIEDU</option><option value="SOPED">SOPED</option><option value="SETEF">SETEF</option><option value="SDMP">SDMP</option><option value="SDAP">SDAP</option><option value="SAST">SAST</option><option value="RENAEST">RENAEST</option><option value="SESV">SESV</option><option value="SMO">SMO</option><option value="SEP">SEP</option><option value="STSV">STSV</option><option value="SISV">SISV</option><option value="SIM">SIM</option><option value="SGR">SGR</option><option value="SAT">SAT</option><option value="SENT">SENT</option><option value="SFI">SFI</option></select>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="field-label">Status</label>
+                                        <select id="projStatus" class="input-style" onchange="toggleRiskInput()"></select>
+                                    </div>
+                                    <!-- NOVO CAMPO DE RISCOS -->
+                                    <div id="riskField" class="flex flex-col hidden-field animate-fade-in">
+                                        <label class="field-label text-red-600"><i class="fas fa-exclamation-triangle mr-1"></i> Riscos e Pontos de Atenção</label>
+                                        <textarea id="projRisks" rows="3" class="input-style resize-none border-red-200 bg-red-50 focus:ring-red-200 placeholder-red-300 text-red-900" placeholder="Descreva os riscos, impedimentos ou motivos do atraso..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="roadmapSection" class="mt-6 space-y-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="form-section-title !mb-0 !border-0"><strong>04. Roadmap</strong></h4>
+                            <button type="button" onclick="addRoadmapRow()" id="addRoadmapBtn" class="text-[10px] font-black bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md uppercase transition-colors">+ Nova Etapa</button>
+                        </div>
+                        <div id="roadmapContainer" class="space-y-3"></div>
+                    </div>
+                    <div class="mt-12 flex gap-4 pb-8">
+                        <button type="button" id="btnDeleteProject" onclick="deleteProject()" class="hidden bg-red-50 text-red-600 font-bold px-6 py-4 rounded-2xl shadow-sm hover:bg-red-100 transition-all uppercase text-xs tracking-[0.1em] border border-red-100">Excluir Registro</button>
+                        <button type="button" id="saveBtn" onclick="saveProject()" class="flex-1 bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-xl hover:bg-blue-700 transition-all uppercase text-xs tracking-[0.2em]">Gravar Dados</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edição Indicador -->
+    <div id="indicatorModal" class="items-center justify-center p-2 sm:p-4" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
+            <div class="bg-gradient-to-r from-pink-600 to-rose-500 px-6 py-4 flex justify-between items-center text-white shrink-0">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <h3 id="indModalTitle" class="font-black uppercase tracking-tight">Atualizar Indicador</h3>
+                </div>
+                <button onclick="toggleModal('indicatorModal')" class="hover:text-pink-200 transition-colors"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto">
+                <form id="indicatorForm">
+                    <input type="hidden" id="indId">
+                    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="field-label">Nome do Indicador</label>
+                            <input type="text" id="indName" class="input-style font-bold">
+                        </div>
+                        <div>
+                            <label class="field-label">Código / ID</label>
+                            <input type="text" id="indCode" class="input-style" placeholder="Ex: 5736">
+                        </div>
+                         <div>
+                            <label class="field-label">Produto / Categoria</label>
+                            <input type="text" id="indProduct" class="input-style" placeholder="Ex: RESPEITO À VIDA">
+                        </div>
+                        <div>
+                            <label class="field-label">Meta 2026</label>
+                            <input type="number" step="0.01" id="indMeta" class="input-style">
+                        </div>
+                        <div>
+                            <label class="field-label">Unidade</label>
+                            <input type="text" id="indUnit" class="input-style" placeholder="Ex: %">
+                        </div>
+                         <div>
+                            <label class="field-label">Tipo</label>
+                            <select id="indType" class="input-style">
+                                <option value="ppa">Estratégico (PPA)</option>
+                                <option value="other">Outros</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label class="field-label">Regra de Cálculo</label>
+                            <select id="indRule" class="input-style">
+                                <option value="Soma">Soma (Acumulado)</option>
+                                <option value="Último">Último Valor</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Seção PPA Dinâmica (Preenchida via JS) -->
+                    <div id="indPpaSection" class="hidden mb-8 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-200 pb-2">Histórico PPA (2024-2027)</h5>
+                        <div id="indPpaGrid" class="grid grid-cols-2 gap-4"></div>
+                    </div>
+                    
+                    <!-- NOVA SEÇÃO: Lançamento Mensal 2025 -->
+                    <div id="indMonths2025Wrapper" class="hidden mb-8 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <h5 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4 border-b border-indigo-200 pb-2">Lançamento Mensal 2025 (Histórico)</h5>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-4" id="indMonthsGrid2025">
+                            <!-- Gerado via JS -->
+                        </div>
+                    </div>
+                    
+                    <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">Lançamento Mensal 2026 (Realizado)</h5>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-4" id="indMonthsGrid">
+                        <!-- Gerado via JS -->
+                    </div>
+                    
+                    <div class="mt-8 flex gap-3">
+                         <button type="button" id="btnDeleteIndicator" onclick="deleteIndicator()" class="hidden bg-red-50 text-red-600 font-bold px-6 py-3 rounded-xl shadow-sm hover:bg-red-100 transition-all uppercase text-xs tracking-[0.1em] border border-red-100">Excluir</button>
+                        <button type="button" onclick="saveIndicator()" class="flex-1 bg-pink-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-pink-200 hover:bg-pink-700 transition-all uppercase text-xs tracking-widest">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Shell -->
+    <div id="appShell" class="flex flex-col md:flex-row h-dvh md:h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col shadow-xl shrink-0 z-30 h-auto md:h-full">
+            <div class="p-3 md:p-5 border-b border-slate-800 flex justify-between md:block items-center">
+                <div>
+                    <h1 class="text-base md:text-xl font-bold tracking-tight uppercase">DSV <span class="text-blue-400">2026</span></h1>
+                    <p class="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">Painel de Gestão</p>
+                </div>
+                <div id="sysStatus" class="md:mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider py-1 md:py-2 px-2 md:px-3 rounded-lg w-auto md:w-full transition-all border border-slate-700/50 bg-slate-800">
+                    <span id="sysStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                    <span id="sysStatusText" class="text-slate-400 hidden sm:inline">Iniciando...</span>
+                </div>
+            </div>
+            
+            <nav class="flex-1 flex md:flex-col flex-row overflow-x-auto md:overflow-y-auto px-2 py-2 md:px-3 md:mt-3 space-x-2 md:space-x-0 md:space-y-3 bg-slate-900 scrollbar-hide shrink-0 items-center md:items-stretch">
+                <div class="flex-none min-w-[140px] md:w-full">
+                    <p class="text-[10px] font-normal text-slate-500 uppercase tracking-widest mb-2 px-2 hidden md:block">Visualização</p>
+                    <div class="flex md:block space-x-2 md:space-x-0 md:space-y-1">
+                        <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-folder w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Projetos</span>
+                        </button>
+                        <button onclick="switchTab('contracts')" id="tab-contracts" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-file-contract w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Contratos</span>
+                        </button>
+                        <button onclick="switchTab('operational')" id="tab-operational" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-tasks w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Operacional</span>
+                        </button>
+                        <button onclick="switchTab('gantt')" id="tab-gantt" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-stream w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Cronograma</span>
+                        </button>
+                        <button onclick="switchTab('indicators')" id="tab-indicators" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-chart-line w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Indicadores</span>
+                        </button>
+                        <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-calendar-alt w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Calendário</span>
+                        </button>
+                        <button onclick="switchTab('portaria')" id="tab-portaria" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-balance-scale w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Portaria nº44/25</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex-none min-w-[200px] md:w-full border-l md:border-l-0 border-slate-700 pl-2 md:pl-0 h-full md:h-auto flex items-center md:block">
+                    <div class="w-full">
+                        <p class="text-[10px] font-normal text-slate-500 uppercase tracking-widest mb-1 px-2 hidden md:block">Coordenações</p>
+                        <div id="coordBtnContainer" class="flex md:grid md:grid-cols-2 gap-2 px-1">
+                            <button id="coord-EPT" onclick="setFilter('EPT')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">EPT</button>
+                            <button id="coord-CEC" onclick="setFilter('CEC')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CEC</button>
+                            <button id="coord-CET" onclick="setFilter('CET')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CET</button>
+                            <button id="coord-CGSV" onclick="setFilter('CGSV')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CGSV</button>
+                            <button id="coord-COST" onclick="setFilter('COST')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">COST</button>
+                            <button id="coord-CIST" onclick="setFilter('CIST')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CIST</button>
+                            <button id="coord-all" onclick="setFilter('all')" class="coord-btn md:col-span-2 bg-slate-700 p-2 rounded-lg text-[10px] font-bold text-white text-center uppercase whitespace-nowrap hover:bg-slate-600">Limpar</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden relative">
+            <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-4 md:py-5 flex flex-col md:flex-row justify-between items-start md:items-center shadow-sm sticky top-0 z-20 gap-3">
+                <h2 id="viewTitle" class="text-base md:text-xl font-black text-slate-800 uppercase tracking-tight">Portfólio de Projetos</h2>
+                <div class="relative w-full md:w-72">
+                    <i class="fas fa-search absolute left-3 top-3 text-slate-300 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="renderData();" placeholder="Pesquisar..." class="w-full bg-slate-50 border border-slate-100 rounded-xl pl-10 pr-3 py-2.5 text-xs outline-none focus:ring-2 focus:ring-blue-100 transition-all">
+                </div>
+            </header>
+
+            <!-- Container Principal -->
+            <div id="standardView" class="flex-1 flex flex-col transition-colors duration-300 pb-20 md:pb-0">
+                <div id="statsWrapper" class="px-4 md:px-6 pt-6 flex flex-col xl:flex-row gap-6">
+                    <div id="statsRow1" class="flex-1 responsive-stats-grid transition-all duration-500">
+                        <div id="cardTotal" onclick="setListFilter('all')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm stat-card active-filter">
+                            <p class="text-[9px] text-slate-400 uppercase font-black mb-1">Total</p><div id="statTotal" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardBacklog" onclick="setListFilter('Backlog')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-slate-500 uppercase font-black mb-1">Backlog</p><div id="statBacklog" class="text-xl font-black text-slate-700">0</div>
+                        </div>
+                        <div id="cardIniciado" onclick="setListFilter('Iniciado')" class="bg-white p-3 rounded-xl border border-sky-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-sky-600 uppercase font-black mb-1">Iniciado</p><div id="statIniciado" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardPlanejado" onclick="setListFilter('Em Planejamento')" class="bg-white p-3 rounded-xl border border-indigo-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-indigo-600 uppercase font-black mb-1 truncate">Em Planejamento</p><div id="statPlanejado" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardExecDP" onclick="setListFilter('Em Execução (Dentro do Planejado)')" class="bg-white p-3 rounded-xl border border-green-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-green-600 uppercase font-black mb-1 leading-tight">Execução<br>(Dentro)</p><div id="statExecDP" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardExecEA" onclick="setListFilter('Em Execução (Atenção)')" class="bg-white p-3 rounded-xl border border-yellow-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-yellow-600 uppercase font-black mb-1 leading-tight">Execução<br>(Atenção)</p><div id="statExecEA" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardExecRA" onclick="setListFilter('Em Execução (Em Risco / Atrasado)')" class="bg-white p-3 rounded-xl border border-orange-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-orange-600 uppercase font-black mb-1 leading-tight">Execução<br>(Risco/Atr)</p><div id="statExecRA" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardCritico" onclick="setListFilter('Crítico')" class="bg-white p-3 rounded-xl border border-red-300 shadow-sm stat-card">
+                            <p class="text-[9px] text-red-600 uppercase font-black mb-1">Crítico</p><div id="statCritico" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardConcluido" onclick="setListFilter('Concluído')" class="bg-white p-3 rounded-xl border border-emerald-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-emerald-600 uppercase font-black mb-1">Concluído</p><div id="statConcluido" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                    </div>
+                    <div id="chartsSection" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hidden transition-all duration-500 gap-4 chart-legend-container flex-col sm:flex-row w-full xl:w-auto xl:min-w-[320px] xl:max-w-[420px] shrink-0">
+                        <div id="statusChartWrapper" class="flex flex-col items-center gap-3 flex-1 justify-center border-b sm:border-b-0 sm:border-r border-slate-100 pb-3 sm:pb-0 sm:pr-3">
+                             <div class="flex flex-col items-center justify-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</p><div id="statusChart" class="chart-pie shadow-inner"></div></div>
+                             <div id="statusLegendContainer" class="grid grid-cols-2 gap-x-2 gap-y-1 justify-center w-full"></div>
+                        </div>
+                        <div id="priorityChartWrapper" class="flex flex-col items-center gap-3 flex-1 justify-center sm:pl-3">
+                             <div class="flex flex-col items-center justify-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Prioridade</p><div id="priorityChart" class="chart-pie shadow-inner"></div></div>
+                             <div class="flex flex-col gap-1 justify-center w-full px-2">
+                                <div onclick="setPriorityFilter('Urgente')" id="legend-prio-urg" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-red-500 shrink-0"></span> <span>Urgente <span id="count-prio-urg" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                                <div onclick="setPriorityFilter('Alta')" id="legend-prio-high" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span> <span>Alta <span id="count-prio-high" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                                <div onclick="setPriorityFilter('Média')" id="legend-prio-mid" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-yellow-500 shrink-0"></span> <span>Média <span id="count-prio-mid" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                                <div onclick="setPriorityFilter('Baixa')" id="legend-prio-low" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span> <span>Baixa <span id="count-prio-low" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="statsRow2" class="px-4 md:px-6 pt-5 hidden">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                        <div><p class="text-[10px] text-purple-500 uppercase font-black mb-1 tracking-widest">Total de Recurso Utilizado</p><p class="text-xs text-slate-400">Somatório de todos os contratos e convênios ativos</p></div>
+                        <div id="statResource" class="text-2xl sm:text-3xl font-black text-slate-800"><span class="text-lg sm:text-xl text-slate-400 mr-2 align-middle">R$</span>0,00</div>
+                    </div>
+                </div>
+                
+                <div id="operationalFilters" class="px-4 md:px-6 pt-5 flex flex-col sm:flex-row gap-4 hidden">
+                    <div class="flex-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Filtrar por Serviço</label>
+                        <select id="filterService" onchange="renderData()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs outline-none">
+                            <option value="all">Todos os Serviços</option><option value="SCCE">SCCE</option><option value="SDCG">SDCG</option><option value="SFP">SFP</option><option value="SIEDU">SIEDU</option><option value="SOPED">SOPED</option><option value="SETEF">SETEF</option><option value="SDMP">SDMP</option><option value="SDAP">SDAP</option><option value="SAST">SAST</option><option value="RENAEST">RENAEST</option><option value="SESV">SESV</option><option value="SMO">SMO</option><option value="SEP">SEP</option><option value="STSV">STSV</option><option value="SISV">SISV</option><option value="SIM">SIM</option><option value="SGR">SGR</option><option value="SAT">SAT</option><option value="SENT">SENT</option><option value="SFI">SFI</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="px-4 md:px-6 pt-5">
+                    <button id="addBtn" onclick="openNewModal()" class="action-btn w-full py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 transition-all text-xs font-black uppercase tracking-widest hover:border-current btn-theme-project">
+                        <i id="addBtnIcon" class="fas fa-plus-circle mr-2"></i> <span id="addBtnText">Adicionar Projeto</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 px-4 md:px-6 py-6 space-y-4" id="listContainer">
+                    <div id="projectsList" class="space-y-3"></div>
+                </div>
+
+                <div id="legendSection" class="px-6 pb-12 pt-8 mt-10 border-t border-slate-200">
+                    <h4 class="legend-section-title">Glossário de Status</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="flex items-start"><span class="legend-badge bg-slate-300 mt-1"></span><div><p class="legend-item-title text-slate-500">Backlog</p><p class="legend-item-desc">Demanda identificada, não iniciada.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-sky-400 mt-1"></span><div><p class="legend-item-title text-sky-600">Iniciado</p><p class="legend-item-desc">Autorizado, sem planejamento.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-indigo-500 mt-1"></span><div><p class="legend-item-title text-indigo-600">Em Planejamento</p><p class="legend-item-desc">Escopo/Cronograma definidos.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-green-500 mt-1"></span><div><p class="legend-item-title text-green-600">Em Execução (OK)</p><p class="legend-item-desc">No prazo, sem desvios.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-amber-400 mt-1"></span><div><p class="legend-item-title text-amber-600">Atenção</p><p class="legend-item-desc">Desvios pontuais.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-orange-500 mt-1"></span><div><p class="legend-item-title text-orange-600">Risco / Atrasado</p><p class="legend-item-desc">Atrasos significativos.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-red-600 mt-1"></span><div><p class="legend-item-title text-red-600">Crítico</p><p class="legend-item-desc">Inviabilidade ou bloqueio.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-emerald-600 mt-1"></span><div><p class="legend-item-title text-emerald-600">Concluído</p><p class="legend-item-desc">Finalizado e entregue.</p></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOVA ABA: GANTT (Matriz de Cronograma) -->
+            <div id="ganttView" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-slate-50 space-y-6 overflow-y-auto pb-20 md:pb-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                     <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center shadow-sm"><i class="fas fa-stream text-xl"></i></div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tight">MATRIZ GANTT INTEGRADA</h3>
+                            <p class="text-xs text-slate-500 font-medium">Cronograma Consolidado</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row items-center gap-4">
+                        <!-- Seletor de Ano -->
+                         <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-lg border border-slate-200">
+                            <span class="text-[10px] font-black text-slate-400 uppercase px-2">Exercício</span>
+                            <select id="ganttYearSelect" onchange="changeGanttYear()" class="bg-white text-slate-700 text-xs font-bold rounded-md px-2 py-1.5 outline-none focus:ring-2 focus:ring-emerald-100 border border-slate-200 cursor-pointer">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026" selected>2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
+                            </select>
+                        </div>
+
+                        <!-- Botões de Filtro -->
+                        <div class="flex bg-slate-100 p-1 rounded-lg gap-1">
+                             <button onclick="toggleGanttFilter('proj')" id="btnGanttProj" class="gantt-filter-btn active gantt-btn-proj px-3 py-1.5 rounded-md text-[10px] font-bold uppercase flex items-center gap-2">
+                                 <span class="w-2 h-2 rounded-full bg-blue-500"></span> Projetos
+                             </button>
+                             <button onclick="toggleGanttFilter('contr')" id="btnGanttContr" class="gantt-filter-btn active gantt-btn-contr px-3 py-1.5 rounded-md text-[10px] font-bold uppercase flex items-center gap-2">
+                                 <span class="w-2 h-2 rounded-full bg-purple-500"></span> Contratos
+                             </button>
+                             <button onclick="toggleGanttFilter('oper')" id="btnGanttOper" class="gantt-filter-btn active gantt-btn-oper px-3 py-1.5 rounded-md text-[10px] font-bold uppercase flex items-center gap-2">
+                                 <span class="w-2 h-2 rounded-full bg-orange-500"></span> Operacional
+                             </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gantt-container" id="ganttContainer">
+                    <div class="gantt-header-wrapper" id="ganttHeader">
+                        <!-- Gerado via JS -->
+                    </div>
+                    <div id="ganttBody" class="gantt-body">
+                        <!-- Linhas geradas via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOVA ABA: INDICADORES -->
+            <div id="indicatorsView" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-slate-50 space-y-6 overflow-y-auto pb-20 md:pb-6">
+                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center shadow-sm"><i class="fas fa-flag-checkered text-xl"></i></div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tight">INDICADORES ESTRATÉGICOS</h3>
+                            <p class="text-xs text-slate-500 font-medium">PPA 2024-2027 | Monitoramento Mensal</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                         <div class="bg-pink-50 px-4 py-2 rounded-lg border border-pink-100">
+                            <span class="text-[10px] font-black text-pink-600 uppercase tracking-wider">Exercício 2026</span>
+                        </div>
+                        <button onclick="openNewIndicatorModal()" class="bg-pink-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase hover:bg-pink-700 transition-all shadow-lg shadow-pink-100 flex items-center justify-center gap-2"><i class="fas fa-plus"></i> Novo Indicador</button>
+                    </div>
+                </div>
+                <div id="indicatorsList" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+                
+                <!-- SEÇÃO OUTROS INDICADORES (NOVA) -->
+                <div class="pt-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm"><i class="fas fa-chart-bar text-lg"></i></div>
+                        <h3 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tight">Outros Indicadores de Acompanhamento</h3>
+                    </div>
+                    <div id="otherIndicatorsList" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+                </div>
+            </div>
+
+            <!-- Views Ocultas -->
+            <div id="portariaView" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-slate-50 space-y-6 overflow-y-auto pb-20 md:pb-6">
+                <!-- Conteúdo Portaria -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
+                    <div class="flex items-center gap-3">
+                         <div class="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-xl flex items-center justify-center shadow-sm"><i class="fas fa-book-open text-xl"></i></div>
+                         <div><h3 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tight">PORTARIA NORMATIVA DETRAN-SP Nº 44/2025</h3><p class="text-xs text-slate-500 font-medium">Regimento Interno e Atribuições</p></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-2 w-full max-w-xl xl:w-auto xl:min-w-[450px]" id="portariaFilters">
+                        <button onclick="setPortariaFilter('all')" class="portaria-filter-btn col-span-12 filter-all active" id="pf-all">Todos</button>
+                        <button onclick="setPortariaFilter('Diretoria')" class="portaria-filter-btn col-span-4 filter-diretoria" id="pf-Diretoria">Diretoria</button>
+                        <button onclick="setPortariaFilter('Coordenadoria')" class="portaria-filter-btn col-span-8 filter-coordenadoria" id="pf-Coordenadoria">Coordenadorias</button>
+                        <button onclick="setPortariaFilter('Divisão')" class="portaria-filter-btn col-span-6 filter-divisao" id="pf-Divisão">Divisões</button>
+                        <button onclick="setPortariaFilter('Serviço')" class="portaria-filter-btn col-span-6 filter-servico" id="pf-Serviço">Serviços</button>
+                    </div>
+                </div>
+                <div id="portariaList" class="space-y-4"></div>
+            </div>
+
+            <div id="calendarView" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-slate-50 space-y-5 pb-20 md:pb-6">
+                <!-- Conteúdo Calendário -->
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm gap-4">
+                     <div class="flex flex-wrap items-center gap-4 pl-2">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Projetos</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-purple-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Contratos</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Operacional</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Eventos</span></div>
+                    </div>
+                    <button onclick="openCalendarModal()" class="w-full md:w-auto bg-green-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase hover:bg-green-700 transition-all shadow-lg shadow-green-100 flex items-center justify-center gap-2"><i class="fas fa-plus"></i> Novo Evento</button>
+                </div>
+                <div class="calendar-new-wrapper">
+                    <div class="calendar-new-header">
+                        <div class="flex items-center justify-center gap-4 sm:gap-8 w-full">
+                            <button onclick="changeMonth(-1)" class="w-10 h-10 hover:bg-blue-50 rounded-full flex items-center justify-center border border-slate-200 text-slate-400 hover:text-blue-600 transition-all shadow-sm flex-none"><i class="fas fa-chevron-left text-lg"></i></button>
+                            <div class="text-center min-w-[140px] sm:min-w-[200px]"><h2 id="calMonthName" class="text-2xl sm:text-3xl font-black capitalize tracking-tight leading-none text-blue-900">Mês</h2><p id="calYearName" class="text-blue-600 font-bold text-sm sm:text-base uppercase mt-1">Ano</p></div>
+                            <button onclick="changeMonth(1)" class="w-10 h-10 hover:bg-blue-50 rounded-full flex items-center justify-center border border-slate-200 text-slate-400 hover:text-blue-600 transition-all shadow-sm flex-none"><i class="fas fa-chevron-right text-lg"></i></button>
+                        </div>
+                    </div>
+                    <div class="calendar-new-main">
+                        <div class="min-w-[700px]">
+                            <div class="grid grid-cols-7 gap-2 mb-3">
+                                <div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Dom</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Seg</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Ter</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Qua</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Qui</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Sex</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Sáb</div>
+                            </div>
+                            <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h3 class="text-xs font-black text-blue-900 uppercase tracking-widest mb-5 border-b border-blue-100 pb-3">Detalhamento de Eventos</h3>
+                    <div id="calendarEventsList" class="space-y-3"><p class="text-slate-400 text-xs italic text-center py-4">Nenhum evento neste mês.</p></div>
+                </div>
+            </div>
+
+            <!-- Logo Detran SP (Rodapé do Painel Principal) -->
+            <footer class="mt-auto py-8 flex flex-col items-center justify-center gap-2 shrink-0 opacity-40 hover:opacity-100 transition-opacity duration-300">
+                <img src="https://www.detran.sp.gov.br/702a783633529610cd8381ac4f5c7b5b.iix" 
+                     alt="Detran-SP" 
+                     class="w-32 h-auto grayscale hover:grayscale-0 transition-all duration-500 ease-in-out mix-blend-multiply"
+                     onerror="this.style.display='none'">
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modal Auxiliar Calendário -->
+    <div id="calendarModal" class="items-center justify-center p-2 sm:p-4" style="display: none; position: fixed; z-index: 60; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px);">
+        <!-- ... existing calendar modal content ... -->
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-black text-slate-800 uppercase tracking-tight">Evento do Calendário</h3>
+                <button onclick="toggleModal('calendarModal')" class="text-slate-400 hover:text-red-500"><i class="fas fa-times"></i></button>
+            </div>
+            <form id="calendarForm" class="p-6 space-y-4">
+                <input type="hidden" id="calEventId">
+                <div class="flex flex-col"><label class="field-label">Nome do Evento</label><input type="text" id="calEventName" class="input-style" required></div>
+                <div class="flex flex-col"><label class="field-label">Área</label><select id="calEventArea" class="input-style"></select></div>
+                <div class="flex flex-col"><label class="field-label">Data</label><input type="date" id="calEventDate" class="input-style" required></div>
+                <div class="flex flex-col"><label class="field-label">Observações</label><textarea id="calEventObs" rows="2" class="input-style resize-none"></textarea></div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" id="btnDeleteEvent" onclick="deleteCalendarEvent()" class="hidden bg-red-50 text-red-600 font-bold px-4 py-3 rounded-xl uppercase text-[10px]">Excluir</button>
+                    <button type="button" id="btnSaveEvent" onclick="saveCalendarEvent()" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl uppercase text-[10px]">Salvar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+	  apiKey: "AIzaSyBVT30qEXkwHw1Le012oKnEJyAUYcwQC8U",
+	  authDomain: "painel-gestao-d674d.firebaseapp.com",
+	  projectId: "painel-gestao-d674d",
+	  storageBucket: "painel-gestao-d674d.firebasestorage.app",
+	  messagingSenderId: "993067198876",
+	  appId: "1:993067198876:web:36e56d669c61437c5ec059",
+	  measurementId: "G-ESGFQTL8L5"
+	};
+
+        let currentUser = null;
+        let activeTab = 'projects';
+        let currentEditingCollection = 'projects'; 
+        let currentFilter = 'all';
+        let currentListFilter = 'all'; 
+        let currentPriorityFilter = 'all';
+        let currentPortariaFilter = 'all';
+        let currentDate = new Date(2026, 0, 1);
+        
+        // Gantt States
+        let ganttYear = 2026;
+        let ganttFilters = { proj: true, contr: true, oper: true };
+
+        const areasList = ["DSV", "EPT", "CEC", "CET", "CGSV", "COST", "CIST", "SCCE", "SDCG", "SFP", "SIEDU", "SOPED", "SETEF", "SDMP", "SDAP", "SAST", "RENAEST", "SESV", "SMO", "SEP", "STSV", "SISV", "SIM", "SGR", "SAT", "SENT", "SFI"];
+        const UNIFIED_STATUS = ["Backlog", "Iniciado", "Em Planejamento", "Em Execução (Dentro do Planejado)", "Em Execução (Atenção)", "Em Execução (Em Risco / Atrasado)", "Crítico", "Concluído"];
+        
+        const STATUS_COLORS_HEX = { "Backlog": "#cbd5e1", "Iniciado": "#38bdf8", "Em Planejamento": "#6366f1", "Em Execução (Dentro do Planejado)": "#22c55e", "Em Execução (Atenção)": "#fbbf24", "Em Execução (Em Risco / Atrasado)": "#f97316", "Crítico": "#dc2626", "Concluído": "#059669" };
+        const STATUS_COLORS_TW_BG = { "Backlog": "bg-slate-300", "Iniciado": "bg-sky-400", "Em Planejamento": "bg-indigo-500", "Em Execução (Dentro do Planejado)": "bg-green-500", "Em Execução (Atenção)": "bg-amber-400", "Em Execução (Em Risco / Atrasado)": "bg-orange-500", "Crítico": "bg-red-600", "Concluído": "bg-emerald-600" };
+
+        const PORTARIA_DATA = [
+            { art: 'Art. 256', title: 'Diretoria de Segurança Viária', type: 'Diretoria', preamble: 'Compete dirigir, planejar, coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Segurança viária e educação para o trânsito', 'Educação corporativa e governança da aprendizagem', 'Aplicação e repasse de valores arrecadados para segurança viária', 'Estatística, estudos, pesquisas e integração de informações para segurança viária', 'Diretrizes para a fiscalização de trânsito e policiamento ostensivo', 'Integração e atuação em rede com os órgãos do Sistema Estadual de Trânsito (SISTRAN)'] },
+            { art: 'Art. 257', title: 'Escola Pública de Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Educação de crianças, adolescentes, jovens e adultos sobre legislação', 'Promoção da Política Nacional de Trânsito (PNT) e cidadania', 'Campanhas de conscientização para o trânsito seguro', 'Ações de educação para condutores profissionais', 'Gestão da educação corporativa, formação e desenvolvimento contínuo'] },
+            { art: 'Art. 258', title: 'Coordenadoria de Educação Corporativa', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Programas de capacitação e desenvolvimento profissional', 'Gestão do conhecimento organizacional', 'Avaliação de desempenho e competências', 'Programas de educação corporativa e gamificação', 'Monitoramento e avaliação de resultados de capacitação', 'Articulação com instituições de ensino e parceiros', 'Gestão das plataformas tecnológicas de ensino', 'Desenvolvimento de lideranças e gestão estratégica'] },
+            { art: 'Art. 259', title: 'Serviço de Desenvolvimento de Competências Específicas', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Mapeamento de competências técnicas', 'Elaboração de programas de treinamento específicos', 'Avaliação de aprendizagem'] },
+            { art: 'Art. 260', title: 'Serviço de Desenvolvimento de Competências Gerais', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de habilidades comportamentais', 'Implementação de programas de liderança', 'Promoção de cultura organizacional'] },
+            { art: 'Art. 261', title: 'Serviço de Formação Profissional', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de programas de formação inicial', 'Gestão de estágios e trainee', 'Implementação de programas de certificação'] },
+            { art: 'Art. 262', title: 'Coordenadoria de Educação para o Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de programas educacionais', 'Articulação com instituições de ensino', 'Promoção da cidadania no trânsito'] },
+            { art: 'Art. 263', title: 'Serviço de Integração da Educação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Articulação com instituições educacionais', 'Desenvolvimento de parcerias educativas', 'Implementação de projetos pedagógicos'] },
+            { art: 'Art. 264', title: 'Serviço de Operações de Educação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Organização de eventos educativos', 'Gestão logística de ações educacionais', 'Implementação de campanhas de trânsito'] },
+            { art: 'Art. 265', title: 'Serviço de Promoção de Educação no Ensino Fundamental', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de material didático', 'Capacitação de educadores', 'Implementação de projetos escolares'] },
+            { art: 'Art. 266', title: 'Serviço de Desenvolvimento de Motoristas Profissionais', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de programas de capacitação para motoristas profissionais', 'Avaliação de competências de condutores', 'Promoção de práticas de direção segura'] },
+            { art: 'Art. 267', title: 'Serviço de Desenvolvimento de Agentes Públicos', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Capacitação de agentes de trânsito', 'Atualização em legislação e procedimentos', 'Desenvolvimento de habilidades de fiscalização'] },
+            { art: 'Art. 268', title: 'Coordenadoria Geral de Segurança Viária', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Implementação e monitoramento dos Planos de Redução de Mortes e Lesões', 'Execução de programas e acordos de cooperação', 'Coleta e gestão de dados estatísticos sobre sinistros', 'Aplicação, transparência e prestação de contas dos investimentos'] },
+            { art: 'Art. 269', title: 'Coordenadoria do Observatório de Segurança no Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração e implantação do Plano Estadual de Segurança Viária', 'Desdobramento do Pnatrans e compartilhamento de dados', 'Análise de dados estatísticos de segurança viária', 'Produção de relatórios estatísticos', 'Desenvolvimento de indicadores de desempenho', 'Estudo de padrões e tendências em sinistros', 'Articulação com órgãos do SNT e instituições acadêmicas', 'Gestão das plataformas tecnológicas e painéis de dados'] },
+            { art: 'Art. 270', title: 'Divisão de Estatísticas de Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de banco de dados de trânsito', 'Análise estatística avançada', 'Elaboração de relatórios técnicos'] },
+            { art: 'Art. 271', title: 'Serviço de Análise de Sinistro de Trânsito', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Investigação de acidentes de trânsito', 'Análise de fatores de risco', 'Elaboração de relatórios técnicos'] },
+            { art: 'Art. 272', title: 'Serviço de Integração da Informação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de sistemas de informação', 'Integração de bases de dados', 'Desenvolvimento de ferramentas de análise'] },
+            { art: 'Art. 273', title: 'Divisão de Redução de Mortes e Lesões no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento de ações de segurança viária', 'Monitoramento de indicadores de segurança', 'Articulação intersetorial'] },
+            { art: 'Art. 274', title: 'Serviço de Estratégia de Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de estratégias de prevenção', 'Análise de eficácia de intervenções', 'Proposição de medidas de segurança'] },
+            { art: 'Art. 275', title: 'Serviço de Monitoramento', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Acompanhamento de indicadores de segurança', 'Elaboração de relatórios de desempenho', 'Identificação de tendências e padrões'] },
+            { art: 'Art. 276', title: 'Divisão de Estudos para Segurança no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de pesquisas em segurança viária', 'Avaliação de políticas públicas de trânsito', 'Proposição de inovações em segurança'] },
+            { art: 'Art. 277', title: 'Serviço de Estudos e Pesquisas', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Condução de pesquisas em segurança viária', 'Análise de tendências e comportamentos no trânsito', 'Elaboração de relatórios científicos'] },
+            { art: 'Art. 278', title: 'Serviço de Tecnologia em Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Avaliação de novas tecnologias', 'Implementação de soluções inovadoras', 'Monitoramento de tendências tecnológicas'] },
+            { art: 'Art. 279', title: 'Coordenadoria de Integração dos Sistemas de Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Articulação interinstitucional', 'Gestão de parcerias', 'Coordenação de projetos integrados'] },
+            { art: 'Art. 280', title: 'Divisão de Integração para Segurança no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de projetos interinstitucionais', 'Promoção de eventos de integração', 'Gestão de informações intersetoriais'] },
+            { art: 'Art. 281', title: 'Serviço de Integração para Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Implementação de ações integradas', 'Articulação com parceiros locais', 'Monitoramento de projetos conjuntos'] },
+            { art: 'Art. 282', title: 'Divisão do Plano Estadual de Segurança Viária', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de planos estratégicos', 'Monitoramento de metas e indicadores', 'Articulação com municípios'] },
+            { art: 'Art. 283', title: 'Serviço de Integração com os Municípios', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Articulação com gestores municipais', 'Apoio técnico a municípios', 'Promoção de ações conjuntas'] },
+            { art: 'Art. 284', title: 'Serviço de Gestão de Recursos', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento orçamentário', 'Gestão financeira de projetos', 'Prestação de contas'] },
+            { art: 'Art. 285', title: 'Serviço de Análise Técnica', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Avaliação técnica de projetos', 'Elaboração de pareceres técnicos', 'Suporte à tomada de decisões'] },
+            { art: 'Art. 286', title: 'Divisão de Engenharia de Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento de infraestrutura viária', 'Análise de projetos de engenharia de tráfego', 'Proposição de melhorias viárias'] },
+            { art: 'Art. 287', title: 'Serviço de Engenharia de Trânsito', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de projetos de sinalização', 'Análise de segurança viária', 'Proposição de intervenções físicas'] },
+            { art: 'Art. 288', title: 'Serviço de Fiscalização de Intervenções', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de contratos e fiscalização de obras', 'Avaliação de conformidade técnica e jurídica', 'Elaboração de relatórios de inspeção'] }
+        ];
+        
+        // Dados Iniciais de Indicadores
+        const INITIAL_INDICATORS = [
+            // Produto: RESPEITO À VIDA (Estratégico PPA)
+            { 
+                id: 'ind_5736', 
+                code: '5736', 
+                product: 'RESPEITO À VIDA',
+                name: 'NÚMERO DE MUNICÍPIOS INTEGRADOS AO SNT', 
+                meta: 75, 
+                unit: 'un', 
+                rule: 'Soma',
+                type: 'ppa',
+                monthly: [2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                monthly_2025: [4, 4, 5, 4, 3, 5, 4, 5, 6, 5, 4, 6],
+                ppa: { '2024': 50, '2025': 75, '2026': 75, '2027': 103 },
+                ppaRealized: { '2024': 52, '2025': 55 }
+            },
+            { 
+                id: 'ind_5737', 
+                code: '5737', 
+                product: 'RESPEITO À VIDA',
+                name: 'TAXA DE ÓBITOS POR SINISTROS (/100k hab)', 
+                meta: 9.55, 
+                unit: '/100k hab', 
+                rule: 'Último valor',
+                type: 'ppa',
+                monthly: [10.2, 10.15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                monthly_2025: [10.5, 10.4, 10.45, 10.3, 10.25, 10.2, 10.3, 10.35, 10.4, 10.3, 10.2, 10.18],
+                ppa: { '2024': 10.18, '2025': 9.87, '2026': 9.55, '2027': 9.24 },
+                ppaRealized: { '2024': 10.18, '2025': 10.18 }
+            },
+            // Produto: CAPACITAÇÃO (Estratégico PPA)
+            { 
+                id: 'ind_5801', 
+                code: '5801', 
+                product: 'CAPACITAÇÃO, EDUCAÇÃO E DADOS',
+                name: 'NÚMERO DE VAGAS OFERECIDAS (EPT/CONTRATOS)', 
+                meta: 228131, 
+                unit: 'un', 
+                rule: 'Último valor',
+                type: 'ppa', 
+                monthly: [180000, 185000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                monthly_2025: [150000, 155000, 160000, 165000, 168000, 170000, 172000, 174000, 176000, 178000, 180000, 182000],
+                ppa: { '2024': 172500, '2025': 198375, '2026': 228131, '2027': 330789 },
+                ppaRealized: { '2024': 175000, '2025': 182000 }
+            },
+            { 
+                id: 'ind_5802', 
+                code: '5802', 
+                product: 'CAPACITAÇÃO, EDUCAÇÃO E DADOS',
+                name: 'PERCENTUAL DE CERTIFICADOS EMITIDOS', 
+                meta: 90, 
+                unit: '%', 
+                rule: 'Último valor',
+                type: 'ppa',
+                monthly: [87, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                monthly_2025: [85, 85, 86, 86, 87, 87, 86, 87, 88, 88, 88, 89],
+                ppa: { '2024': 86, '2025': 88, '2026': 90, '2027': 92 },
+                ppaRealized: { '2024': 87, '2025': 89 }
+            },
+            // OUTROS INDICADORES (Novos)
+            {
+                id: 'ind_other_01',
+                code: 'SISTRAN',
+                product: 'OUTROS INDICADORES',
+                name: 'MUNICÍPIOS INTEGRADOS AO SISTRAN',
+                meta: 100,
+                unit: 'un',
+                rule: 'Soma',
+                type: 'other',
+                monthly: [5, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ppa: { '2024': 20, '2025': 50, '2026': 100 }, 
+                ppaRealized: { '2024': 25, '2025': 48 }
+            },
+            {
+                id: 'ind_other_02',
+                code: 'META BR',
+                product: 'META BR',
+                name: 'META BR - RESPONSABILIDADE DSV',
+                meta: 100,
+                unit: '%',
+                rule: 'Último valor',
+                type: 'other',
+                monthly: [15, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                ppa: { '2026': 100 },
+                ppaRealized: {}
+            },
+            {
+                id: 'ind_other_03',
+                code: 'INFOSIGA',
+                product: 'GESTÃO DA INFORMAÇÃO',
+                name: 'NÚMERO DE ACESSOS AO INFOSIGA',
+                meta: 50000,
+                unit: 'acessos',
+                rule: 'Soma',
+                type: 'other',
+                monthly: [3500, 4100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                monthly_2025: [3000, 3200, 3100, 3300, 3500, 3400, 3600, 3800, 4000, 4200, 4100, 4300],
+                ppa: { '2025': 40000, '2026': 50000 },
+                ppaRealized: { '2025': 43500 }
+            }
+        ];
+
+        // DADOS MOCKADOS PARA EXEMPLO COMPLETO
+        const MOCK_PROJECTS = [
+            { id: 'p1', name: 'Implantação da Escola Pública de Trânsito Digital', desc: 'Plataforma EAD para cursos de cidadania e reciclagem.', coord: 'EPT', status: 'Em Execução (Dentro do Planejado)', priority: 'Alta', manager: 'João Silva', prazo: '2026-08-15', actors: ['DETRAN', 'PRODESP'], roadmap: [{data: '2026-01-15', etapa: 'Definição de Escopo'}, {data: '2026-03-10', etapa: 'Contratação Plataforma'}, {data: '2026-06-20', etapa: 'Migração Conteúdo'}, {data: '2026-08-15', etapa: 'Lançamento Oficial'}] },
+            { id: 'p2', name: 'Campanha Maio Amarelo 2026', desc: 'Ações de conscientização em todo o estado.', coord: 'CEC', status: 'Em Planejamento', priority: 'Urgente', manager: 'Maria Oliveira', prazo: '2026-05-31', actors: ['Imprensa', 'Prefeituras'], roadmap: [{data: '2026-02-01', etapa: 'Briefing Agência'}, {data: '2026-04-01', etapa: 'Aprovação Peças'}, {data: '2026-05-01', etapa: 'Início Veiculação'}] },
+            { id: 'p3', name: 'Revisão da Sinalização Viária - Região Norte', desc: 'Auditoria e projeto de melhoria em rodovias estaduais.', coord: 'CGSV', status: 'Iniciado', priority: 'Média', manager: 'Carlos Santos', prazo: '2026-11-30', actors: ['DER', 'Polícia Rodoviária'], roadmap: [{data: '2026-02-15', etapa: 'Início Auditoria'}, {data: '2026-05-20', etapa: 'Relatório Preliminar'}] },
+            { id: 'p4', name: 'Integração de Dados SISTRAN', desc: 'Unificação das bases de dados municipais.', coord: 'CIST', status: 'Em Execução (Atenção)', priority: 'Alta', manager: 'Ana Costa', prazo: '2026-09-30', risks: 'Atraso na entrega da API por parte de 3 municípios piloto.', roadmap: [{data: '2026-01-10', etapa: 'Definição API'}, {data: '2026-04-15', etapa: 'Testes Piloto'}] },
+            { id: 'p5', name: 'Programa Motofretista Seguro', desc: 'Capacitação e entrega de equipamentos.', coord: 'EPT', status: 'Em Execução (Em Risco / Atrasado)', priority: 'Crítico', manager: 'Roberto Lima', prazo: '2026-07-01', risks: 'Problemas na licitação dos equipamentos de segurança.', roadmap: [{data: '2026-01-20', etapa: 'Abertura Licitação'}, {data: '2026-03-01', etapa: 'Homologação (Atrasado)'}] },
+            { id: 'p6', name: 'Observatório de Dados 2.0', desc: 'Atualização do dashboard do INFOSIGA.', coord: 'COST', status: 'Backlog', priority: 'Baixa', manager: 'Fernanda Souza', prazo: '2026-12-20', roadmap: [] }
+        ];
+
+        const MOCK_CONTRACTS = [
+            { id: 'c1', name: 'Manutenção de Radares - Lote 1', desc: 'Contrato de manutenção preventiva e corretiva.', type: 'Contrato', hasResource: 'Sim', resourceValue: '1.500.000,00', status: 'Em Execução (Dentro do Planejado)', priority: 'Alta', manager: 'Engenharia', prazo: '2026-12-31', coord: 'CGSV', roadmap: [{data: '2026-01-01', etapa: 'Início Vigência'}, {data: '2026-06-01', etapa: 'Medição Semestral'}, {data: '2026-12-31', etapa: 'Fim Vigência'}] },
+            { id: 'c2', name: 'Convênio Educativo - Prefeitura SP', desc: 'Ações conjuntas nas escolas municipais.', type: 'Convênio', hasResource: 'Não', resourceValue: '0,00', status: 'Em Planejamento', priority: 'Média', manager: 'Educação', prazo: '2027-02-28', coord: 'CEC', roadmap: [{data: '2026-03-01', etapa: 'Assinatura'}, {data: '2026-04-01', etapa: 'Início Ações'}] },
+            { id: 'c3', name: 'Aquisição de Tablets para Fiscalização', desc: 'Equipamentos para agentes de trânsito.', type: 'Contrato', hasResource: 'Sim', resourceValue: '450.000,00', status: 'Concluído', priority: 'Média', manager: 'Tecnologia', prazo: '2026-01-15', coord: 'CIST', roadmap: [{data: '2026-01-15', etapa: 'Entrega e Aceite'}] }
+        ];
+
+        const MOCK_OPERATIONAL = [
+            { id: 'o1', name: 'Fiscalização Lei Seca - Operação Verão', desc: 'Intensificação nas praias.', service: 'SFP', status: 'Concluído', priority: 'Alta', manager: 'Capitão Silva', prazo: '2026-02-28', duration: '60', coord: 'CGSV', roadmap: [{data: '2026-01-01', etapa: 'Início Operação'}, {data: '2026-02-28', etapa: 'Fim Operação'}] },
+            { id: 'o2', name: 'Credenciamento de Novas Autoescolas', desc: 'Análise documental e vistoria.', service: 'SCCE', status: 'Em Execução (Dentro do Planejado)', priority: 'Média', manager: 'Setor Credenciamento', prazo: '2026-04-30', duration: '30', coord: 'EPT', roadmap: [{data: '2026-03-01', etapa: 'Início Análises'}] },
+            { id: 'o3', name: 'Auditoria de Processos de Pontuação', desc: 'Revisão de processos de suspensão.', service: 'SDCG', status: 'Backlog', priority: 'Baixa', manager: 'Controle Interno', prazo: '2026-08-30', duration: '90', coord: 'CET', roadmap: [] }
+        ];
+
+        const MOCK_EVENTS = [
+            { id: 'e1', name: 'Reunião de Diretoria', area: 'DSV', prazo: '2026-01-10', obs: 'Alinhamento estratégico trimestral' },
+            { id: 'e2', name: 'Workshop Maio Amarelo', area: 'CEC', prazo: '2026-02-15', obs: 'Definição de tema e parceiros' },
+            { id: 'e3', name: 'Visita Técnica - Radar Inteligente', area: 'CGSV', prazo: '2026-03-05', obs: 'Teste de nova tecnologia em Campinas' }
+        ];
+
+        // Inicializa dataStore com dados Mockados por padrão
+        let dataStore = { 
+            projects: MOCK_PROJECTS, 
+            contracts: MOCK_CONTRACTS, 
+            operational: MOCK_OPERATIONAL, 
+            calendarEvents: MOCK_EVENTS, 
+            indicators: INITIAL_INDICATORS 
+        };
+
+        async function initAuth() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        }
+        initAuth();
+
+        function initListeners() {
+            ['projects', 'contracts', 'operational', 'calendar_events', 'indicators'].forEach(colName => {
+                const storeKey = colName === 'calendar_events' ? 'calendarEvents' : colName;
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', colName), (snapshot) => {
+                    let items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    // Se o Firestore estiver vazio, MANTÉM os dados mockados para exibição
+                    if (items.length > 0) {
+                         if (colName === 'indicators' && items.length === 0) {
+                            dataStore[storeKey] = INITIAL_INDICATORS;
+                        } else {
+                            dataStore[storeKey] = items;
+                        }
+                    }
+                    // Se items.length == 0, não faz nada e deixa o mock data (para fins de demonstração)
+                    
+                    window.updateStatusUI(snapshot.metadata.hasPendingWrites ? 'syncing' : 'online');
+                    window.renderData();
+                }, (err) => console.error("Erro snapshot:", err));
+            });
+        }
+
+        window.toggleModal = id => { const m = document.getElementById(id); m.style.display = (m.style.display === 'flex' || m.style.display === 'block') ? 'none' : 'flex'; };
+        
+        window.openNewModal = () => {
+            const form = document.getElementById('projectForm');
+            form.reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('roadmapContainer').innerHTML = '';
+            document.querySelectorAll('.actor-tag').forEach(el => el.remove());
+            document.getElementById('btnDeleteProject').classList.add('hidden'); 
+
+            // Track collection
+            currentEditingCollection = activeTab === 'calendar' || activeTab === 'gantt' ? 'projects' : activeTab;
+
+            const typeField = document.getElementById('contractTypeField');
+            const resourceField = document.getElementById('resourceLogicField');
+            const relField = document.getElementById('relationalField');
+            const serviceField = document.getElementById('serviceField');
+            const durationField = document.getElementById('operationalDurationField'); 
+            
+            typeField.classList.add('hidden-field');
+            resourceField.classList.add('hidden-field');
+            relField.classList.add('hidden-field');
+            serviceField.classList.add('hidden-field');
+            durationField.classList.add('hidden-field'); 
+            
+            document.getElementById('projRisks').value = '';
+            document.getElementById('riskField').classList.add('hidden-field');
+
+            const statusSelect = document.getElementById('projStatus');
+            statusSelect.innerHTML = UNIFIED_STATUS.map(s => `<option value="${s}">${s}</option>`).join('');
+
+            // Adjust modal based on collection (not just activeTab)
+            if (currentEditingCollection === 'projects') {
+                document.getElementById('modalTitle').innerText = 'Novo Projeto Estratégico';
+            } else if (currentEditingCollection === 'contracts') {
+                document.getElementById('modalTitle').innerText = 'Novo Contrato / Convênio';
+                typeField.classList.remove('hidden-field');
+                resourceField.classList.remove('hidden-field');
+                document.getElementById('contractRelationWrapper').classList.remove('hidden-field');
+            } else if (currentEditingCollection === 'operational') {
+                document.getElementById('modalTitle').innerText = 'Nova Atividade Operacional';
+                relField.classList.remove('hidden-field');
+                serviceField.classList.remove('hidden-field');
+                durationField.classList.remove('hidden-field'); 
+            }
+
+            toggleModal('projectModal');
+        };
+
+        window.toggleContractRelInput = () => {
+            const isSim = document.querySelector('input[name="contractRelType"]:checked').value === 'sim';
+            const wrapper = document.getElementById('projectSelectWrapper');
+            if (isSim) {
+                wrapper.classList.remove('hidden-field');
+                const select = document.getElementById('projRelation');
+                select.innerHTML = '<option value="">Selecione...</option>' + 
+                                  dataStore.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            } else {
+                wrapper.classList.add('hidden-field');
+            }
+        };
+
+        window.toggleResourceInput = () => {
+            const hasResource = document.getElementById('projHasResource').value === 'Sim';
+            document.getElementById('resourceValueField').classList.toggle('hidden-field', !hasResource);
+        };
+
+        window.toggleOriginInput = () => {
+            const isProject = document.querySelector('input[name="originType"]:checked').value === 'projeto';
+            document.getElementById('projectSelectWrapper').classList.toggle('hidden-field', !isProject);
+        };
+
+        window.toggleRiskInput = () => {
+            const status = document.getElementById('projStatus').value;
+            const riskField = document.getElementById('riskField');
+            const show = ["Em Execução (Atenção)", "Em Execução (Em Risco / Atrasado)", "Crítico"].includes(status);
+            riskField.classList.toggle('hidden-field', !show);
+        };
+
+        window.addRoadmapRow = (data = '', etapa = '') => {
+            const container = document.getElementById('roadmapContainer');
+            const row = document.createElement('div');
+            row.className = 'grid grid-cols-1 sm:grid-cols-12 gap-3 items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm';
+            row.innerHTML = `
+                <div class="sm:col-span-4"><input type="date" class="input-style roadmap-date" value="${data}"></div>
+                <div class="sm:col-span-7"><input type="text" class="input-style roadmap-step" placeholder="Etapa..." value="${etapa}"></div>
+                <div class="sm:col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button></div>
+            `;
+            container.appendChild(row);
+        };
+
+        window.saveProject = async () => {
+            if (!currentUser) return;
+            const id = document.getElementById('editId').value || Date.now().toString();
+            const roadmap = [];
+            document.querySelectorAll('#roadmapContainer > div').forEach(row => {
+                const d = row.querySelector('.roadmap-date').value;
+                const e = row.querySelector('.roadmap-step').value;
+                if (d && e) roadmap.push({ data: d, etapa: e });
+            });
+
+            const actors = Array.from(document.querySelectorAll('.actor-tag span')).map(s => s.innerText);
+
+            const data = {
+                name: document.getElementById('projName').value,
+                desc: document.getElementById('projDesc').value,
+                obs: document.getElementById('projObs').value,
+                manager: document.getElementById('projManager').value,
+                actors: actors,
+                sei: document.getElementById('projSei').value,
+                prazo: document.getElementById('projPrazo').value,
+                coord: document.getElementById('projCoord').value,
+                status: document.getElementById('projStatus').value,
+                priority: document.getElementById('projPriority').value,
+                docLink: document.getElementById('projDocs').value,
+                risks: document.getElementById('projRisks').value, 
+                duration: document.getElementById('projDuration').value, 
+                roadmap: roadmap,
+                updatedAt: Date.now()
+            };
+
+            if (currentEditingCollection === 'contracts') {
+                data.type = document.getElementById('projType').value;
+                data.hasResource = document.getElementById('projHasResource').value;
+                data.resourceValue = document.getElementById('projResourceValue').value;
+            } else if (currentEditingCollection === 'operational') {
+                data.service = document.getElementById('projService').value;
+            }
+
+            try {
+                // Uses currentEditingCollection instead of activeTab
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', currentEditingCollection, id), data);
+                toggleModal('projectModal');
+            } catch (err) {
+                console.error("Erro ao salvar:", err);
+            }
+        };
+        
+        window.deleteProject = async () => {
+             const id = document.getElementById('editId').value;
+             if (!id) return;
+             if(confirm("Tem certeza que deseja excluir este registro?")) {
+                 try {
+                     // Uses currentEditingCollection instead of activeTab
+                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', currentEditingCollection, id));
+                     toggleModal('projectModal');
+                 } catch(err) {
+                     console.error("Erro ao excluir:", err);
+                 }
+             }
+        };
+        
+        window.deleteIndicator = async () => {
+             const id = document.getElementById('indId').value;
+             if (!id) return;
+             if(confirm("Tem certeza que deseja excluir este indicador?")) {
+                 try {
+                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'indicators', id));
+                     toggleModal('indicatorModal');
+                 } catch(err) {
+                     console.error("Erro ao excluir:", err);
+                 }
+             }
+        };
+
+        window.editItem = (id, type) => {
+            currentEditingCollection = type || activeTab; // Capture the correct collection type
+            const t = currentEditingCollection;
+            const item = dataStore[t]?.find(i => i.id === id);
+            if (!item) return;
+
+            // Reset form for editing
+            const form = document.getElementById('projectForm');
+            form.reset();
+            document.getElementById('roadmapContainer').innerHTML = '';
+            document.querySelectorAll('.actor-tag').forEach(el => el.remove());
+            
+            // Set up visibility based on collection type
+            const typeField = document.getElementById('contractTypeField');
+            const resourceField = document.getElementById('resourceLogicField');
+            const relField = document.getElementById('relationalField');
+            const serviceField = document.getElementById('serviceField');
+            const durationField = document.getElementById('operationalDurationField'); 
+            
+            typeField.classList.add('hidden-field');
+            resourceField.classList.add('hidden-field');
+            relField.classList.add('hidden-field');
+            serviceField.classList.add('hidden-field');
+            durationField.classList.add('hidden-field'); 
+            document.getElementById('riskField').classList.add('hidden-field');
+
+            // Populate Fields
+            document.getElementById('editId').value = item.id;
+            document.getElementById('projName').value = item.name || '';
+            document.getElementById('projDesc').value = item.desc || '';
+            document.getElementById('projObs').value = item.obs || '';
+            document.getElementById('projManager').value = item.manager || '';
+            document.getElementById('projSei').value = item.sei || '';
+            document.getElementById('projPrazo').value = item.prazo || '';
+            document.getElementById('projCoord').value = item.coord || '';
+            document.getElementById('projStatus').value = item.status || 'Backlog';
+            document.getElementById('projPriority').value = item.priority || 'Média';
+            document.getElementById('projDocs').value = item.docLink || '';
+            document.getElementById('projRisks').value = item.risks || ''; 
+            document.getElementById('projDuration').value = item.duration || ''; 
+            document.getElementById('btnDeleteProject').classList.remove('hidden'); 
+
+            if (item.status) {
+                 const statusSelect = document.getElementById('projStatus');
+                 // Ensure options exist
+                 statusSelect.innerHTML = UNIFIED_STATUS.map(s => `<option value="${s}">${s}</option>`).join('');
+                 statusSelect.value = item.status;
+                 window.toggleRiskInput(); 
+            }
+
+            if (item.actors && Array.isArray(item.actors)) {
+                const container = document.getElementById('actorsTagContainer');
+                const input = document.getElementById('actorInput');
+                item.actors.forEach(act => {
+                    const tag = document.createElement('div');
+                    tag.className = 'actor-tag';
+                    tag.innerHTML = `<span>${act}</span><i class="fas fa-times cursor-pointer hover:text-blue-800" onclick="this.parentElement.remove()"></i>`;
+                    container.insertBefore(tag, input);
+                });
+            }
+
+            if (item.roadmap) {
+                item.roadmap.forEach(r => window.addRoadmapRow(r.data, r.etapa));
+            }
+            
+            if (t === 'contracts') {
+                document.getElementById('modalTitle').innerText = 'Editar Contrato';
+                typeField.classList.remove('hidden-field');
+                resourceField.classList.remove('hidden-field');
+                document.getElementById('projType').value = item.type || 'Contrato';
+                document.getElementById('projHasResource').value = item.hasResource || 'Não';
+                document.getElementById('projResourceValue').value = item.resourceValue || '';
+                window.toggleResourceInput();
+            } else if (t === 'operational') {
+                document.getElementById('modalTitle').innerText = 'Editar Atividade Operacional';
+                relField.classList.remove('hidden-field');
+                serviceField.classList.remove('hidden-field');
+                durationField.classList.remove('hidden-field');
+                document.getElementById('projService').value = item.service || 'SCCE';
+            } else {
+                 document.getElementById('modalTitle').innerText = 'Editar Projeto';
+            }
+            
+            toggleModal('projectModal');
+        };
+
+        window.setPortariaFilter = (type) => {
+            currentPortariaFilter = type;
+            document.querySelectorAll('.portaria-filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('pf-' + type);
+            if(activeBtn) activeBtn.classList.add('active');
+            window.renderPortaria();
+        };
+
+        window.renderPortaria = () => {
+            const container = document.getElementById('portariaList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            container.innerHTML = '';
+            let filtered = PORTARIA_DATA.filter(item => 
+                item.title.toLowerCase().includes(search) || 
+                item.items.some(sub => sub.toLowerCase().includes(search)) ||
+                item.art.toLowerCase().includes(search)
+            );
+            if (currentPortariaFilter !== 'all') filtered = filtered.filter(item => item.type === currentPortariaFilter);
+            if(filtered.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 italic text-center mt-10">Nenhum item encontrado.</p>';
+                return;
+            }
+            filtered.forEach(item => {
+                let bc = '', tc = '';
+                if(item.type === 'Diretoria') { bc = 'badge-diretoria'; tc = 'type-diretoria'; }
+                else if(item.type === 'Coordenadoria') { bc = 'badge-coordenadoria'; tc = 'type-coordenadoria'; }
+                else if(item.type === 'Divisão') { bc = 'badge-divisao'; tc = 'type-divisao'; }
+                else { bc = 'badge-servico'; tc = 'type-servico'; }
+                const itemsHtml = item.items.map((sub, idx) => `
+                    <li class="flex items-start gap-3 relative pl-2 group/item">
+                        <span class="text-[10px] font-bold text-slate-400 mt-0.5 w-5 shrink-0 text-right">${['I','II','III','IV','V','VI','VII','VIII','IX','X'][idx] || '-'}</span>
+                        <span class="text-sm text-slate-700 leading-snug border-l border-slate-200 pl-3">${sub}</span>
+                    </li>`).join('');
+                container.innerHTML += `<div class="portaria-card ${tc}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">${item.art}</span>
+                        <h4 class="font-bold text-slate-800 text-lg leading-tight mb-2">${item.title}</h4>
+                        <p class="text-xs text-slate-500 italic border-l-2 border-slate-200 pl-2 leading-relaxed max-w-2xl">${item.preamble}</p></div>
+                        <span class="portaria-badge ${bc} ml-2 shrink-0">${item.type}</span>
+                    </div><ul class="space-y-3 pt-2">${itemsHtml}</ul></div>`;
+            });
+        };
+
+        window.switchTab = (tab) => {
+            activeTab = tab; currentListFilter = 'all'; currentFilter = 'all'; currentPriorityFilter = 'all';
+            const app = document.getElementById('appShell');
+            const addBtn = document.getElementById('addBtn');
+            const addBtnText = document.getElementById('addBtnText');
+            app.classList.remove('contracts-theme', 'operational-theme', 'portaria-theme');
+            document.querySelectorAll('.tab-btn').forEach(b => b.className = "tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap text-slate-400");
+            const mapBg = { projects: "bg-blue-600", contracts: "bg-purple-600", operational: "bg-orange-500", portaria: "bg-cyan-600", calendar: "bg-indigo-600", indicators: "bg-pink-600", gantt: "bg-emerald-600" };
+            document.getElementById(`tab-${tab}`).className += " " + mapBg[tab] + " text-white";
+            addBtn.className = "action-btn w-full py-3.5 border-2 border-dashed border-slate-200 rounded-2xl transition-all text-xs font-black uppercase tracking-widest hover:border-current";
+            document.getElementById('standardView').classList.add('hidden');
+            document.getElementById('portariaView').classList.add('hidden');
+            document.getElementById('calendarView').classList.add('hidden');
+            document.getElementById('indicatorsView').classList.add('hidden');
+            document.getElementById('ganttView').classList.add('hidden');
+            document.getElementById('statsWrapper').classList.add('hidden');
+            document.getElementById('addBtn').parentElement.classList.add('hidden');
+
+            if (tab === 'projects') {
+                addBtn.classList.add('btn-theme-project'); addBtnText.innerText = 'Adicionar Projeto';
+                document.getElementById('viewTitle').innerText = 'Portfólio de Projetos';
+                document.getElementById('standardView').classList.remove('hidden');
+                document.getElementById('statsWrapper').classList.remove('hidden');
+                document.getElementById('addBtn').parentElement.classList.remove('hidden');
+                showCharts(true, false);
+            } else if (tab === 'contracts') {
+                addBtn.classList.add('btn-theme-contract'); addBtnText.innerText = 'Adicionar Contrato';
+                app.classList.add('contracts-theme'); document.getElementById('viewTitle').innerText = 'Contratos | Convênios';
+                document.getElementById('standardView').classList.remove('hidden');
+                document.getElementById('statsWrapper').classList.remove('hidden');
+                document.getElementById('addBtn').parentElement.classList.remove('hidden');
+                showCharts(true, false);
+            } else if (tab === 'operational') {
+                addBtn.classList.add('btn-theme-operational'); addBtnText.innerText = 'Adicionar Atividade';
+                app.classList.add('operational-theme'); document.getElementById('viewTitle').innerText = 'Atividades Operacionais';
+                document.getElementById('standardView').classList.remove('hidden');
+                document.getElementById('statsWrapper').classList.remove('hidden');
+                document.getElementById('addBtn').parentElement.classList.remove('hidden');
+                showCharts(false, true);
+            } else if (tab === 'portaria') {
+                app.classList.add('portaria-theme'); document.getElementById('viewTitle').innerText = 'Portaria Detran nº 44/2025';
+                document.getElementById('portariaView').classList.remove('hidden');
+                window.renderPortaria();
+            } else if (tab === 'calendar') {
+                document.getElementById('viewTitle').innerText = 'Calendário Estratégico';
+                document.getElementById('calendarView').classList.remove('hidden');
+                window.renderCalendar();
+            } else if (tab === 'indicators') {
+                document.getElementById('viewTitle').innerText = 'Indicadores Estratégicos';
+                document.getElementById('indicatorsView').classList.remove('hidden');
+                window.renderIndicators();
+            } else if (tab === 'gantt') {
+                addBtn.classList.add('btn-theme-gantt');
+                document.getElementById('viewTitle').innerText = 'Matriz Gantt Integrada';
+                document.getElementById('ganttView').classList.remove('hidden');
+                window.renderGantt();
+            }
+
+            document.getElementById('filterService').value = 'all';
+            document.getElementById('operationalFilters').style.display = tab === 'operational' ? 'flex' : 'none';
+            document.getElementById('statsRow2').style.display = tab === 'contracts' ? 'block' : 'none';
+            document.querySelectorAll('.active-coord').forEach(b => b.classList.remove('active-coord'));
+            document.querySelectorAll('.active-filter').forEach(c => c.classList.remove('active-filter'));
+            document.getElementById('cardTotal')?.classList.add('active-filter');
+            
+            document.querySelectorAll('[id^="legend-prio-"]').forEach(el => el.classList.remove('active-legend'));
+            
+            if(tab !== 'portaria' && tab !== 'calendar' && tab !== 'indicators' && tab !== 'gantt') window.renderData();
+        };
+
+        window.renderIndicators = () => {
+            const listPPA = document.getElementById('indicatorsList');
+            const listOther = document.getElementById('otherIndicatorsList');
+            
+            const data = dataStore.indicators.length > 0 ? dataStore.indicators : INITIAL_INDICATORS;
+            
+            listPPA.innerHTML = '';
+            listOther.innerHTML = '';
+
+            data.forEach(ind => {
+                let total = 0;
+                if (ind.rule === 'Soma') {
+                    total = ind.monthly.reduce((a, b) => a + Number(b), 0);
+                } else {
+                    const filled = ind.monthly.filter(v => Number(v) !== 0);
+                    total = filled.length > 0 ? filled[filled.length - 1] : 0;
+                }
+                
+                const formattedTotal = total.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+                const formattedMeta = ind.meta.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+                const percent = ind.meta > 0 ? Math.round((total / ind.meta) * 100) : 0;
+                
+                const monthsHtml = ind.monthly.map((v, i) => {
+                    const mName = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'][i];
+                    return `<div class="month-cell"><div class="month-label">${mName}</div><div class="month-value">${Number(v).toLocaleString('pt-BR')}</div></div>`;
+                }).join('');
+
+                let ppaHtml = '';
+                if(ind.ppa && Object.keys(ind.ppa).length > 0) {
+                    const years = Object.keys(ind.ppa).sort();
+                    ppaHtml = `<div class="mt-5 pt-4 border-t border-slate-100">
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Evolução Anual</p>
+                        <div class="grid grid-cols-4 gap-2">
+                            ${years.map(year => {
+                                const isCurrent = year === '2026';
+                                const metaVal = ind.ppa[year];
+                                const realVal = (ind.ppaRealized && ind.ppaRealized[year]) ? ind.ppaRealized[year] : null;
+                                let displayVal = metaVal.toLocaleString('pt-BR');
+                                
+                                if(realVal !== null && year !== '2026') {
+                                     displayVal = `<span class="text-[9px] text-slate-400 block">Meta: ${metaVal}</span><span class="text-pink-600 font-black">${realVal}</span>`;
+                                } else if (year === '2025') {
+                                     displayVal = `<span class="text-[9px] text-slate-400 block">Meta</span><span class="text-slate-600 font-bold">${metaVal}</span>`;
+                                }
+
+                                return `<div class="ppa-year-box ${isCurrent ? 'current' : ''}">
+                                    <div class="ppa-year-label">${year}</div>
+                                    <div class="ppa-year-value">${displayVal}</div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                }
+
+                const cardHtml = `
+                    <div class="indicator-card" onclick="openIndicatorModal('${ind.id}')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-[10px] font-black ${ind.type === 'ppa' ? 'text-pink-500' : 'text-indigo-500'} uppercase tracking-widest block mb-1">Produto ${ind.code} <span class="text-slate-400">|</span> ${ind.product}</span>
+                                <h4 class="font-bold text-slate-800 text-base leading-tight">${ind.name}</h4>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-black text-slate-400 uppercase">${ind.rule === 'Soma' ? 'Acumulado' : 'Último'}</span>
+                                <p class="text-xl font-black ${ind.type === 'ppa' ? 'text-pink-700' : 'text-indigo-700'} leading-none">${formattedTotal} <span class="text-xs text-slate-400">${ind.unit}</span></p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-5">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase mb-1">
+                                <span>Progresso da Meta (2026)</span>
+                                <span>${percent}% de ${formattedMeta} ${ind.unit}</span>
+                            </div>
+                            <div class="progress-bg"><div class="progress-fill" style="width: ${Math.min(percent, 100)}%; background-color: ${ind.type === 'ppa' ? '#db2777' : '#4f46e5'};"></div></div>
+                        </div>
+
+                        <div class="grid grid-cols-6 gap-2">
+                            ${monthsHtml}
+                        </div>
+                        
+                        ${ppaHtml}
+                    </div>
+                `;
+
+                if(ind.type === 'ppa') listPPA.innerHTML += cardHtml;
+                else listOther.innerHTML += cardHtml;
+            });
+        };
+        
+        window.openNewIndicatorModal = () => {
+             document.getElementById('indicatorForm').reset();
+             document.getElementById('indId').value = '';
+             document.getElementById('indModalTitle').innerText = 'Novo Indicador';
+             
+             // Limpa Grids
+             document.getElementById('indMonthsGrid').innerHTML = Array(12).fill(0).map((v, i) => {
+                const mName = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][i];
+                return `<div class="flex flex-col"><label class="field-label text-center">${mName}</label><input type="number" step="0.01" class="input-style text-center font-bold text-pink-700" value="0" id="indMonth_${i}"></div>`;
+            }).join('');
+             document.getElementById('indMonths2025Wrapper').classList.add('hidden');
+             document.getElementById('indPpaSection').classList.add('hidden');
+             document.getElementById('btnDeleteIndicator').classList.add('hidden'); 
+             
+             toggleModal('indicatorModal');
+        };
+
+        window.openIndicatorModal = (id) => {
+            const data = dataStore.indicators.length > 0 ? dataStore.indicators : INITIAL_INDICATORS;
+            const ind = data.find(i => i.id === id);
+            if(!ind) return;
+
+            document.getElementById('indId').value = ind.id;
+            document.getElementById('indModalTitle').innerText = 'Atualizar Indicador';
+            
+            // Popula os novos campos de definição
+            document.getElementById('indName').value = ind.name;
+            document.getElementById('indCode').value = ind.code || '';
+            document.getElementById('indProduct').value = ind.product || '';
+            document.getElementById('indMeta').value = ind.meta;
+            document.getElementById('indUnit').value = ind.unit || '';
+            document.getElementById('indType').value = ind.type || 'other';
+            document.getElementById('indRule').value = ind.rule || 'Soma';
+            document.getElementById('btnDeleteIndicator').classList.remove('hidden'); 
+
+            const grid = document.getElementById('indMonthsGrid');
+            grid.innerHTML = ind.monthly.map((v, i) => {
+                const mName = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][i];
+                return `
+                    <div class="flex flex-col">
+                        <label class="field-label text-center">${mName}</label>
+                        <input type="number" step="0.01" class="input-style text-center font-bold text-pink-700" value="${v}" id="indMonth_${i}">
+                    </div>
+                `;
+            }).join('');
+
+            const wrapper2025 = document.getElementById('indMonths2025Wrapper');
+            const grid2025 = document.getElementById('indMonthsGrid2025');
+            
+            if (ind.monthly_2025) {
+                wrapper2025.classList.remove('hidden');
+                grid2025.innerHTML = ind.monthly_2025.map((v, i) => {
+                    const mName = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'][i];
+                    return `
+                        <div class="flex flex-col">
+                            <label class="field-label text-center text-indigo-400">${mName}</label>
+                            <input type="number" step="0.01" class="input-style text-center font-bold text-indigo-700 border-indigo-200 focus:ring-indigo-200" value="${v}" id="indMonth2025_${i}">
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                wrapper2025.classList.add('hidden');
+                grid2025.innerHTML = '';
+            }
+
+            const ppaSection = document.getElementById('indPpaSection');
+            const ppaGrid = document.getElementById('indPpaGrid');
+            const ppaTitle = ppaSection.querySelector('h5'); 
+            
+            if(ind.ppa && Object.keys(ind.ppa).length > 0) {
+                ppaSection.classList.remove('hidden');
+                
+                if (ind.type === 'ppa') {
+                    ppaTitle.innerText = 'Histórico PPA (2024-2027)';
+                } else {
+                    ppaTitle.innerText = 'Histórico / Dados Anteriores';
+                }
+
+                ppaGrid.innerHTML = Object.keys(ind.ppa).sort().map(year => {
+                    const metaVal = ind.ppa[year];
+                    const realVal = (ind.ppaRealized && ind.ppaRealized[year]) ? ind.ppaRealized[year] : '';
+                    
+                    let content = '';
+                    
+                    if(year === '2024') {
+                         content = `<div class="bg-slate-100 p-3 rounded-lg opacity-60"><span class="block text-[10px] font-black text-slate-400 uppercase">${year}</span><span class="font-bold text-slate-600">Meta: ${metaVal}</span></div>`;
+                    } else if (year === '2027') {
+                         content = `<div class="bg-slate-100 p-3 rounded-lg opacity-60"><span class="block text-[10px] font-black text-slate-400 uppercase">${year}</span><span class="font-bold text-slate-600">Meta: ${metaVal}</span></div>`;
+                    } else if (year === '2025') {
+                         if (ind.monthly_2025) {
+                             const sum2025 = ind.monthly_2025.reduce((a, b) => a + Number(b), 0);
+                             content = `<div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                                <span class="block text-[10px] font-black text-indigo-600 uppercase mb-2">${year} - Meta: ${metaVal}</span>
+                                <div class="flex flex-col gap-1">
+                                    <label class="text-[9px] font-bold text-indigo-300 uppercase">Total (Soma Mensal)</label>
+                                    <div class="text-lg font-black text-indigo-700">${sum2025.toLocaleString('pt-BR')}</div>
+                                    <input type="hidden" id="indPpaReal_2025" value="${sum2025}">
+                                </div>
+                             </div>`;
+                         } else {
+                             content = `<div class="bg-white p-3 rounded-lg border border-pink-200">
+                                <span class="block text-[10px] font-black text-pink-600 uppercase mb-2">${year} - Meta: ${metaVal}</span>
+                                <div class="flex flex-col gap-1">
+                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Alcançado</label>
+                                    <input type="number" step="0.01" id="indPpaReal_2025" value="${realVal}" class="input-style !py-1 !text-xs font-black text-slate-700 border-pink-200" placeholder="0">
+                                </div>
+                             </div>`;
+                         }
+                    } else if (year === '2026') {
+                         content = `<div class="bg-pink-50 p-3 rounded-lg border border-pink-100"><span class="block text-[10px] font-black text-pink-600 uppercase">${year}</span><span class="text-xs font-bold text-slate-500 italic">Preenchimento mensal abaixo</span></div>`;
+                    }
+                    
+                    return content;
+                }).join('');
+            } else {
+                ppaSection.classList.add('hidden');
+            }
+
+            toggleModal('indicatorModal');
+        };
+
+        window.saveIndicator = async () => {
+            const id = document.getElementById('indId').value || Date.now().toString();
+            
+            // Dados Básicos
+            const baseData = {
+                name: document.getElementById('indName').value,
+                code: document.getElementById('indCode').value,
+                product: document.getElementById('indProduct').value,
+                meta: parseFloat(document.getElementById('indMeta').value) || 0,
+                unit: document.getElementById('indUnit').value,
+                type: document.getElementById('indType').value,
+                rule: document.getElementById('indRule').value
+            };
+
+            const newMonthly = [];
+            for(let i=0; i<12; i++) {
+                newMonthly.push(Number(document.getElementById(`indMonth_${i}`).value) || 0);
+            }
+            baseData.monthly = newMonthly;
+            
+            // Preserva dados existentes se for edição
+            let existingData = {};
+            if (dataStore.indicators.length > 0) {
+                 const found = dataStore.indicators.find(i => i.id === id);
+                 if(found) existingData = found;
+            }
+
+            const finalData = { ...existingData, ...baseData, id: id };
+            
+            // Tratamento especial para 2025 se estiver visível
+            if (!document.getElementById('indMonths2025Wrapper').classList.contains('hidden')) {
+                 const newMonthly2025 = [];
+                for(let i=0; i<12; i++) {
+                    newMonthly2025.push(Number(document.getElementById(`indMonth2025_${i}`).value) || 0);
+                }
+                finalData.monthly_2025 = newMonthly2025;
+                
+                if (finalData.rule === 'Soma') {
+                    const sum2025 = newMonthly2025.reduce((a, b) => a + b, 0);
+                    if(!finalData.ppaRealized) finalData.ppaRealized = {};
+                    finalData.ppaRealized['2025'] = sum2025;
+                }
+            } else {
+                 const ppa2025Input = document.getElementById('indPpaReal_2025');
+                 if(ppa2025Input) {
+                    if(!finalData.ppaRealized) finalData.ppaRealized = {};
+                    finalData.ppaRealized['2025'] = Number(ppa2025Input.value) || 0;
+                 }
+            }
+            
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'indicators', id), finalData);
+                toggleModal('indicatorModal');
+            } catch(err) {
+                console.error("Erro ao salvar indicador", err);
+            }
+        };
+
+        // GANTT RENDERING LOGIC (NOVO)
+        window.changeGanttYear = () => {
+            const el = document.getElementById('ganttYearSelect');
+            ganttYear = parseInt(el.value);
+            window.renderGantt();
+        };
+
+        window.toggleGanttFilter = (type) => {
+            ganttFilters[type] = !ganttFilters[type];
+            
+            // Atualiza UI dos botões
+            const btnId = type === 'proj' ? 'btnGanttProj' : (type === 'contr' ? 'btnGanttContr' : 'btnGanttOper');
+            const btn = document.getElementById(btnId);
+            
+            if(ganttFilters[type]) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+            
+            window.renderGantt();
+        };
+
+        window.renderGantt = () => {
+            const containerHeader = document.getElementById('ganttHeader');
+            const containerBody = document.getElementById('ganttBody');
+            
+            // Limpa containers
+            containerHeader.innerHTML = '';
+            containerBody.innerHTML = '';
+
+            let allItems = [
+                ...dataStore.projects.map(i => ({...i, type: 'proj', label: 'Proj'})),
+                ...dataStore.contracts.map(i => ({...i, type: 'contr', label: 'Contr'})),
+                ...dataStore.operational.map(i => ({...i, type: 'oper', label: 'Oper'}))
+            ];
+
+            // Aplica Filtros
+            allItems = allItems.filter(item => ganttFilters[item.type]);
+
+            if (allItems.length === 0) {
+                containerBody.innerHTML = '<div class="p-12 text-center flex flex-col items-center justify-center text-slate-300"><i class="fas fa-filter text-4xl mb-3"></i><p class="italic text-sm">Nenhum registro para os filtros selecionados.</p></div>';
+                
+                // Ainda renderiza o header para não quebrar o layout
+                // (Opcional, mas fica melhor visualmente)
+            }
+
+            // --- CONFIGURAÇÃO DE TEMPO DINÂMICA ---
+            const yearStart = new Date(ganttYear, 0, 1);
+            const yearEnd = new Date(ganttYear, 11, 31);
+            
+            // Verificação Bissexto
+            const isLeap = (ganttYear % 4 === 0 && ganttYear % 100 !== 0) || (ganttYear % 400 === 0);
+            const daysInYear = isLeap ? 366 : 365;
+
+            // --- RENDERIZAÇÃO DO HEADER ---
+            const rowMonths = document.createElement('div');
+            rowMonths.className = 'gantt-months-row';
+            const labelPlaceholder = document.createElement('div');
+            labelPlaceholder.style.width = '280px';
+            labelPlaceholder.style.flexShrink = '0';
+            labelPlaceholder.style.borderRight = '1px solid #e2e8f0';
+            labelPlaceholder.style.background = '#f8fafc';
+            rowMonths.appendChild(labelPlaceholder);
+
+            const months = [
+                {n: 'JANEIRO', d: 31}, {n: 'FEVEREIRO', d: isLeap ? 29 : 28}, {n: 'MARÇO', d: 31},
+                {n: 'ABRIL', d: 30}, {n: 'MAIO', d: 31}, {n: 'JUNHO', d: 30},
+                {n: 'JULHO', d: 31}, {n: 'AGOSTO', d: 31}, {n: 'SETEMBRO', d: 30},
+                {n: 'OUTUBRO', d: 31}, {n: 'NOVEMBRO', d: 30}, {n: 'DEZEMBRO', d: 31}
+            ];
+
+            months.forEach(m => {
+                const cell = document.createElement('div');
+                cell.className = 'gantt-month-cell';
+                const flexBasis = (m.d / daysInYear) * 100;
+                cell.style.flex = `0 0 ${flexBasis}%`; 
+                cell.innerText = m.n;
+                rowMonths.appendChild(cell);
+            });
+            containerHeader.appendChild(rowMonths);
+
+            const rowWeeks = document.createElement('div');
+            rowWeeks.className = 'gantt-weeks-row';
+            const lp2 = labelPlaceholder.cloneNode(true);
+            lp2.style.background = 'transparent';
+            lp2.style.borderBottom = 'none';
+            lp2.innerHTML = `<div class="h-full flex items-center justify-center text-[9px] text-slate-400 font-bold uppercase tracking-widest bg-slate-50">Semanas (${ganttYear})</div>`;
+            rowWeeks.appendChild(lp2);
+
+            const weekWidthPct = (7 / daysInYear) * 100;
+            
+            // 52 Semanas (aprox)
+            // Lógica ajustada para usar o ano selecionado
+            for(let i=1; i<=52; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'gantt-week-cell';
+                cell.style.flex = `0 0 ${weekWidthPct}%`;
+                
+                const currentWeekStart = new Date(yearStart.getTime() + (i-1) * 7 * 24 * 60 * 60 * 1000);
+                const weekOfMonth = Math.ceil(currentWeekStart.getDate() / 7);
+                
+                cell.innerText = weekOfMonth;
+                const monthName = months[currentWeekStart.getMonth()].n;
+                cell.title = `${monthName} - Semana ${weekOfMonth}`;
+
+                if (weekOfMonth === 1 && i > 1) {
+                    cell.classList.add('new-month-start');
+                }
+
+                rowWeeks.appendChild(cell);
+            }
+
+            const lastBit = document.createElement('div');
+            lastBit.className = 'gantt-week-cell';
+            lastBit.style.flex = `0 0 ${(1/daysInYear)*100}%`; // Resto
+            lastBit.innerText = '';
+            lastBit.style.borderRight = 'none';
+            rowWeeks.appendChild(lastBit);
+            
+            containerHeader.appendChild(rowWeeks);
+
+            const minWidth = '1800px';
+            containerHeader.style.minWidth = minWidth;
+            containerBody.style.minWidth = minWidth;
+
+            if (allItems.length === 0) return; // Se vazio, já mostrou msg acima
+
+            // --- RENDERIZAÇÃO DO BODY ---
+            allItems.forEach(item => {
+                const groupWrapper = document.createElement('div');
+                groupWrapper.className = 'gantt-group';
+
+                const row = document.createElement('div');
+                row.className = 'gantt-body-row';
+                
+                const hasChildren = item.roadmap && item.roadmap.length > 0;
+                row.onclick = () => {
+                    if(hasChildren) {
+                        row.classList.toggle('expanded');
+                        const sub = groupWrapper.querySelector('.gantt-sub-rows-container');
+                        sub.classList.toggle('open');
+                    }
+                };
+
+                const labelCol = document.createElement('div');
+                labelCol.className = 'gantt-label-col';
+                labelCol.innerHTML = `
+                    <div class="flex items-center w-full">
+                        <i class="fas fa-chevron-right text-[10px] gantt-chevron ${!hasChildren ? 'invisible' : ''}"></i>
+                        <div class="flex flex-col overflow-hidden">
+                            <span class="type-label label-${item.type}">${item.label}</span>
+                            <span class="truncate block w-full text-[11px]" title="${item.name}">${item.name}</span>
+                        </div>
+                    </div>
+                `;
+                row.appendChild(labelCol);
+
+                const timelineCol = document.createElement('div');
+                timelineCol.className = 'gantt-timeline-col';
+
+                for(let i=1; i<=52; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'gantt-grid-cell';
+                    cell.style.flex = `0 0 ${weekWidthPct}%`;
+                    timelineCol.appendChild(cell);
+                }
+                const last = document.createElement('div');
+                last.className = 'gantt-grid-cell';
+                last.style.flex = `0 0 ${(1/daysInYear)*100}%`;
+                last.style.borderRight = 'none';
+                timelineCol.appendChild(last);
+
+                let startDate = null;
+                let endDate = null;
+
+                if (item.roadmap && item.roadmap.length > 0) {
+                    const sorted = [...item.roadmap].sort((a,b) => a.data.localeCompare(b.data));
+                    startDate = new Date(sorted[0].data);
+                    endDate = new Date(sorted[sorted.length-1].data);
+                }
+                
+                if (item.prazo) {
+                    const pDate = new Date(item.prazo);
+                    if (!endDate || pDate > endDate) endDate = pDate;
+                    if (!startDate) { startDate = new Date(pDate); startDate.setDate(startDate.getDate() - 30); }
+                }
+
+                if (startDate && endDate) {
+                    const displayStart = startDate < yearStart ? yearStart : startDate;
+                    const displayEnd = endDate > yearEnd ? yearEnd : endDate;
+
+                    // Verifica se há intersecção com o ano selecionado
+                    if (displayEnd > yearStart && displayStart < yearEnd) {
+                        const startDiff = Math.max(0, (displayStart - yearStart) / (1000 * 60 * 60 * 24));
+                        const duration = (displayEnd - displayStart) / (1000 * 60 * 60 * 24);
+                        
+                        const leftPct = (startDiff / daysInYear) * 100;
+                        const widthPct = Math.max((duration / daysInYear) * 100, 0.5);
+                        
+                        const bar = document.createElement('div');
+                        const colorClass = window.getStatusColorBg(item.status || 'Backlog');
+                        
+                        bar.className = `gantt-bar ${colorClass}`;
+                        bar.style.left = `${leftPct}%`;
+                        bar.style.width = `${widthPct}%`;
+                        if (widthPct > 5) bar.innerText = item.status || 'Status';
+                        bar.title = `Resumo: ${startDate.toLocaleDateString('pt-BR')} até ${endDate.toLocaleDateString('pt-BR')}`;
+                        
+                        timelineCol.appendChild(bar);
+                    }
+                }
+                row.appendChild(timelineCol);
+                groupWrapper.appendChild(row);
+
+                if (hasChildren) {
+                    const subContainer = document.createElement('div');
+                    subContainer.className = 'gantt-sub-rows-container';
+
+                    item.roadmap.sort((a,b) => a.data.localeCompare(b.data)).forEach(step => {
+                        const sDate = new Date(step.data);
+                        // Filtra etapas que não são do ano selecionado
+                        if (sDate < yearStart || sDate > yearEnd) return;
+
+                        const subRow = document.createElement('div');
+                        subRow.className = 'gantt-sub-row';
+
+                        const subLabel = document.createElement('div');
+                        subLabel.className = 'gantt-label-col sub-label-col';
+                        subLabel.innerHTML = `<span class="truncate" title="${step.etapa}">${step.etapa}</span>`;
+                        subRow.appendChild(subLabel);
+
+                        const subTimeline = document.createElement('div');
+                        subTimeline.className = 'gantt-timeline-col';
+
+                        for(let i=1; i<=52; i++) {
+                            const c = document.createElement('div');
+                            c.className = 'gantt-grid-cell';
+                            c.style.flex = `0 0 ${weekWidthPct}%`;
+                            subTimeline.appendChild(c);
+                        }
+                        const l = document.createElement('div');
+                        l.className = 'gantt-grid-cell';
+                        l.style.flex = `0 0 ${(1/daysInYear)*100}%`;
+                        l.style.borderRight = 'none';
+                        subTimeline.appendChild(l);
+
+                        const sDiff = (sDate - yearStart) / (1000 * 60 * 60 * 24);
+                        const sLeft = (sDiff / daysInYear) * 100;
+                        
+                        const marker = document.createElement('div');
+                        marker.className = 'gantt-milestone';
+                        marker.style.left = `${sLeft}%`;
+                        marker.title = `${step.etapa} - ${sDate.toLocaleDateString('pt-BR')}`;
+                        subTimeline.appendChild(marker);
+
+                        subRow.appendChild(subTimeline);
+                        subContainer.appendChild(subRow);
+                    });
+                    
+                    // Se não sobrou nenhuma etapa (todas filtradas pelo ano), adiciona msg vazia ou apenas o wrapper
+                    if(subContainer.children.length === 0) {
+                         const emptyMsg = document.createElement('div');
+                         emptyMsg.className = 'text-[9px] text-slate-400 italic p-2 pl-12';
+                         emptyMsg.innerText = `Nenhuma etapa em ${ganttYear}.`;
+                         subContainer.appendChild(emptyMsg);
+                    }
+                    
+                    groupWrapper.appendChild(subContainer);
+                }
+
+                containerBody.appendChild(groupWrapper);
+            });
+        };
+
+        function showCharts(showCards, showStatusChart) {
+            const statsRow1 = document.getElementById('statsRow1');
+            const chartsSection = document.getElementById('chartsSection');
+            const statusChartWrapper = document.getElementById('statusChartWrapper');
+            const priorityChartWrapper = document.getElementById('priorityChartWrapper');
+            
+            const statusLegend = document.getElementById('statusLegendContainer');
+            
+            if(showCards) {
+                statsRow1.classList.remove('hidden'); chartsSection.classList.remove('hidden');
+                chartsSection.className = "bg-white p-4 rounded-2xl border border-slate-200 shadow-sm transition-all duration-500 gap-4 chart-legend-container flex-col sm:flex-row w-full xl:w-auto xl:min-w-[320px] xl:max-w-[420px] shrink-0 flex";
+                statusChartWrapper.classList.add('hidden'); priorityChartWrapper.classList.remove('hidden', 'sm:pl-3');
+                
+                statusLegend.className = "grid grid-cols-2 gap-x-2 gap-y-1 justify-center w-full"; 
+            } else {
+                statsRow1.classList.add('hidden'); chartsSection.classList.remove('hidden');
+                chartsSection.className = "flex w-full bg-white p-4 rounded-2xl border border-slate-200 shadow-sm gap-4 chart-legend-container flex-col sm:flex-row";
+                statusChartWrapper.classList.remove('hidden'); priorityChartWrapper.classList.remove('hidden'); priorityChartWrapper.classList.add('sm:pl-3');
+                
+                statusLegend.className = "flex flex-wrap justify-center gap-3 w-full mt-2";
+            }
+        }
+
+        window.renderData = () => {
+            if (activeTab === 'calendar') { window.renderCalendar(); return; }
+            if (activeTab === 'portaria') { window.renderPortaria(); return; }
+            if (activeTab === 'indicators') { window.renderIndicators(); return; }
+            if (activeTab === 'gantt') { window.renderGantt(); return; } // Add gantt check
+            const container = document.getElementById('projectsList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            container.innerHTML = '';
+            let filtered = dataStore[activeTab] || [];
+            if(search) filtered = filtered.filter(i => i.name && i.name.toLowerCase().includes(search));
+            if(currentFilter !== 'all') filtered = filtered.filter(i => i.coord === currentFilter);
+            if(activeTab === 'operational' && document.getElementById('filterService').value !== 'all') filtered = filtered.filter(i => i.service === document.getElementById('filterService').value);
+            
+            if(currentPriorityFilter !== 'all') filtered = filtered.filter(i => i.priority === currentPriorityFilter);
+            
+            const counts = {}; UNIFIED_STATUS.forEach(s => counts[s] = 0);
+            filtered.forEach(item => { if(counts[item.status] !== undefined) counts[item.status]++; });
+            document.getElementById('statTotal').innerText = filtered.length;
+            const map = {'Backlog':'statBacklog','Iniciado':'statIniciado','Em Planejamento':'statPlanejado','Crítico':'statCritico','Concluído':'statConcluido'};
+            Object.keys(map).forEach(k => { if(document.getElementById(map[k])) document.getElementById(map[k]).innerText = counts[k]; });
+            document.getElementById('statExecDP').innerText = counts['Em Execução (Dentro do Planejado)'];
+            document.getElementById('statExecEA').innerText = counts['Em Execução (Atenção)'];
+            document.getElementById('statExecRA').innerText = counts['Em Execução (Em Risco / Atrasado)'];
+            if (activeTab === 'contracts') {
+                let totalResource = 0;
+                filtered.forEach(item => { if (item.resourceValue) { const cleanVal = item.resourceValue.toString().replace(/[R$\s.]/g, '').replace(',', '.'); const val = parseFloat(cleanVal); if (!isNaN(val)) totalResource += val; }});
+                document.getElementById('statResource').innerHTML = `<span class="text-xl text-slate-400 mr-2 align-middle">R$</span>${totalResource.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            }
+            if(currentListFilter !== 'all') filtered = filtered.filter(i => i.status === currentListFilter);
+            const total = filtered.length || 1;
+            if (!document.getElementById('statusChartWrapper').classList.contains('hidden')) {
+                let ca = 0, gs = 'conic-gradient(', lh = '';
+                UNIFIED_STATUS.forEach((st) => {
+                    const c = counts[st], p = (c / total) * 100, color = STATUS_COLORS_HEX[st];
+                    if (c > 0) { gs += `${color} ${ca}% ${ca + p}%, `; ca += p; }
+                    lh += `<div onclick="setListFilter('${st}')" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase cursor-pointer mb-1 ${currentListFilter === st ? 'active-legend' : ''}"><span class="w-2 h-2 rounded-full ${STATUS_COLORS_TW_BG[st]} shrink-0"></span> <span class="truncate">${st.replace('Em Execução ', '')} (${c})</span></div>`;
+                });
+                document.getElementById('statusChart').style.background = (total === 0 || filtered.length === 0) ? '#e2e8f0' : gs.slice(0, -2) + ')';
+                document.getElementById('statusLegendContainer').innerHTML = lh;
+            }
+            if (!document.getElementById('priorityChartWrapper').classList.contains('hidden')) {
+                const urg = filtered.filter(p => p.priority === 'Urgente').length, high = filtered.filter(p => p.priority === 'Alta').length, mid = filtered.filter(p => p.priority === 'Média').length;
+                const pU = Math.round((urg/total)*100), pH = Math.round((high/total)*100), pM = Math.round((mid/total)*100);
+                document.getElementById('priorityChart').style.background = `conic-gradient(#ef4444 0% ${pU}%, #f97316 ${pU}% ${pU+pH}%, #eab308 ${pU+pH}% ${pU+pH+pM}%, #22c55e ${pU+pH+pM}% 100%)`;
+                document.getElementById('count-prio-urg').innerText = `(${urg})`; document.getElementById('count-prio-high').innerText = `(${high})`; document.getElementById('count-prio-mid').innerText = `(${mid})`; document.getElementById('count-prio-low').innerText = `(${filtered.filter(p => p.priority === 'Baixa').length})`;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            filtered.forEach(item => {
+                const sortedRoadmap = (item.roadmap || []).sort((a,b) => a.data.localeCompare(b.data));
+                
+                const roadmapHtml = sortedRoadmap.length > 0 ? `<div class="mt-4 pt-4 border-t border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-3">Roadmap</p><div class="space-y-2 relative before:absolute before:left-[5px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">` + sortedRoadmap.map(r => {
+                    const isPast = r.data < today;
+                    const dotClass = isPast ? 'bg-slate-300' : 'bg-blue-500 ring-4 ring-blue-100';
+                    const dateClass = isPast ? 'text-slate-400' : 'text-blue-600 font-black';
+                    const textClass = isPast ? 'text-slate-400 line-through decoration-slate-300' : 'text-slate-700 font-bold';
+                    
+                    return `<div class="flex items-start gap-4 relative z-10 pl-1"><div class="w-2.5 h-2.5 rounded-full ${dotClass} mt-1.5 shrink-0"></div><div class="flex-1"><p class="text-[10px] ${dateClass}">${new Date(r.data + "T00:00:00").toLocaleDateString('pt-BR')}</p><p class="text-xs ${textClass}">${r.etapa}</p></div></div>`;
+                }).join('') + `</div></div>` : `<div class="mt-4 pt-4 border-t border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Roadmap</p><p class="text-xs text-slate-400 italic">Nenhum marco.</p></div>`;
+                
+                const row = document.createElement('div');
+                row.className = 'accordion-row bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-3';
+                row.innerHTML = `<div class="px-5 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4 flex-1 w-full cursor-pointer" onclick="this.parentElement.parentElement.classList.toggle('active')">
+                            <div class="w-1.5 h-10 sm:h-6 rounded-full ${window.getStatusColorBg(item.status)}"></div>
+                            <div class="flex-1"><h4 class="font-bold text-slate-800 text-base leading-tight">${item.name} <span class="ml-2 text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-black uppercase">${item.coord || 'N/A'}</span></h4></div>
+                        </div><div class="flex items-center gap-6"><div class="text-right"><p class="text-[10px] font-black text-slate-400 uppercase">Prazo</p><p class="text-sm font-bold text-slate-700">${item.prazo ? new Date(item.prazo + "T00:00:00").toLocaleDateString('pt-BR') : '--'}</p></div>
+                        <button onclick="editItem('${item.id}')" class="w-9 h-9 rounded-lg bg-slate-50 text-slate-400 hover:text-blue-600 flex items-center justify-center"><i class="fas fa-edit text-sm"></i></button><i class="fas fa-chevron-down text-slate-300 chevron-icon transition-transform text-xs"></i></div></div>
+                    <div class="accordion-content px-5 sm:px-12 bg-slate-50/50"><div class="py-6 space-y-4"><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="lg:col-span-2 space-y-4">
+                        
+                        <!-- Bloco Descrição -->
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Descrição / Escopo</p><p class="text-sm text-slate-700 leading-relaxed">${item.desc || 'Sem descrição.'}</p></div>
+                        
+                        <!-- Bloco Riscos (NOVO VISUAL NO CARD) -->
+                        ${item.risks ? `<div class="bg-red-50 p-3 rounded-xl border border-red-100"><p class="text-[10px] font-black text-red-500 uppercase mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> Riscos / Impedimentos</p><p class="text-xs text-red-700 leading-relaxed font-bold">${item.risks}</p></div>` : ''}
+
+                        <!-- Bloco Observações (NOVO) -->
+                        ${item.obs ? `<div class="pt-2"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Observações Gerais</p><p class="text-xs text-slate-600 leading-relaxed bg-amber-50 p-2 rounded border border-amber-100">${item.obs}</p></div>` : ''}
+
+                        ${roadmapHtml}
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-2">Status</p><span class="text-[11px] font-black uppercase px-2 py-1 rounded-lg ${window.getStatusColor(item.status)} block w-full text-center">${item.status}</span></div>
+                        
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 space-y-3">
+                            <!-- Gestor -->
+                            ${item.manager ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Gestor</p><p class="text-xs font-bold text-slate-700">${item.manager}</p></div>` : ''}
+                            
+                            <!-- SEI (NOVO) -->
+                            ${item.sei ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Processo SEI</p><p class="text-xs font-bold text-slate-700 bg-slate-100 px-1 rounded inline-block">${item.sei}</p></div>` : ''}
+
+                            <!-- Campos Específicos (Contrato/Operacional) -->
+                            ${item.type ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Tipo</p><p class="text-xs font-bold text-purple-700">${item.type}</p></div>` : ''}
+                            ${item.service ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Serviço</p><p class="text-xs font-bold text-orange-700">${item.service}</p></div>` : ''}
+                            ${item.resourceValue ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Valor</p><p class="text-xs font-black text-emerald-600">R$ ${item.resourceValue}</p></div>` : ''}
+                            ${item.duration ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Duração</p><p class="text-xs font-bold text-slate-700">${item.duration} dias</p></div>` : ''}
+
+                            <!-- Atores -->
+                            ${item.actors && item.actors.length ? `<div class="pt-2 border-t border-slate-50 mt-2"><p class="text-[9px] font-black text-slate-400 uppercase mb-1">Atores</p><div class="flex flex-wrap gap-1">${item.actors.map(a => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded font-bold border border-slate-200">${a}</span>`).join('')}</div></div>` : ''}
+                            
+                            <!-- Docs -->
+                            ${item.docLink ? `<div class="pt-2"><a href="${item.docLink}" target="_blank" class="text-[10px] font-bold text-blue-500 hover:underline flex items-center gap-1"><i class="fas fa-external-link-alt"></i> Docs</a></div>` : ''}
+                        </div>
+                    </div></div></div></div>`;
+                container.appendChild(row);
+            });
+        };
+
+        window.changeMonth = (offset) => { currentDate.setMonth(currentDate.getMonth() + offset); window.renderCalendar(); };
+        window.renderCalendar = () => {
+            const grid = document.getElementById('calendarGrid'), lc = document.getElementById('calendarEventsList');
+            if(!grid || !lc) return; grid.innerHTML = '';
+            const y = currentDate.getFullYear(), m = currentDate.getMonth(), mn = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            document.getElementById('calMonthName').innerText = mn[m]; document.getElementById('calYearName').innerText = y;
+            const fd = new Date(y, m, 1).getDay(), dim = new Date(y, m + 1, 0).getDate();
+            for(let i=0; i<fd; i++) grid.appendChild(Object.assign(document.createElement('div'), {className: 'calendar-new-day-empty'}));
+            let monthEvts = [];
+            for(let d=1; d<=dim; d++) {
+                const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`, cell = Object.assign(document.createElement('div'), {className: 'calendar-new-day-cell'});
+                const today = new Date(); if(d === today.getDate() && m === today.getMonth() && y === today.getFullYear()) cell.classList.add('calendar-day-active');
+                cell.innerHTML = `<span class="text-[10px] font-bold text-slate-400 p-1 block text-right">${d}</span>`;
+                let dayEvts = [];
+                ['projects', 'contracts', 'operational'].forEach(s => dataStore[s]?.forEach(i => { if(i.prazo === ds) dayEvts.push({...i, origin: s}) }));
+                dataStore.calendarEvents.forEach(e => { if(e.prazo === ds) dayEvts.push({...e, origin: 'general'}) });
+                monthEvts = [...monthEvts, ...dayEvts];
+                if(dayEvts.length > 0) cell.innerHTML += `<div class="mt-2 text-center"><span class="bg-blue-50 text-blue-600 border border-blue-100 rounded-md py-0.5 px-2 text-[9px] font-black uppercase inline-block w-full truncate">${dayEvts.length} eventos</span></div>`;
+                grid.appendChild(cell);
+            }
+            lc.innerHTML = monthEvts.length === 0 ? '<p class="text-slate-400 text-xs italic text-center py-4">Nenhum evento.</p>' : monthEvts.sort((a,b) => a.prazo.localeCompare(b.prazo)).map(e => {
+                const colors = { projects: 'bg-blue-500', contracts: 'bg-purple-500', operational: 'bg-orange-500', general: 'bg-green-500' };
+                // FIX: Correctly inject variables into onclick string
+                return `<div class="flex items-center gap-4 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer" onclick="${e.origin === 'general' ? `openCalendarModal('${e.id}')` : `editItem('${e.id}', '${e.origin}')`}">
+                <div class="flex-none w-12 text-center"><span class="block text-xs font-black text-slate-700">${e.prazo.split('-')[2]}/${e.prazo.split('-')[1]}</span></div><div class="w-1.5 h-8 rounded-full ${colors[e.origin]}"></div><div class="flex-1"><p class="text-xs font-bold text-slate-800">${e.name}</p></div><i class="fas fa-chevron-right text-slate-300 text-xs"></i></div>`;
+            }).join('');
+        };
+
+        window.openCalendarModal = (idOrEvent = null) => {
+            const sel = document.getElementById('calEventArea'); 
+            if(sel.options.length === 0) sel.innerHTML = areasList.map(a => `<option value="${a}">${a}</option>`).join('');
+            
+            let e = null;
+            if (typeof idOrEvent === 'string') {
+                e = dataStore.calendarEvents.find(ev => ev.id === idOrEvent);
+            } else if (typeof idOrEvent === 'object') {
+                e = idOrEvent;
+            }
+
+            if(e) { 
+                document.getElementById('calEventId').value = e.id; 
+                document.getElementById('calEventName').value = e.name; 
+                document.getElementById('calEventArea').value = e.area; 
+                document.getElementById('calEventDate').value = e.prazo; 
+                document.getElementById('calEventObs').value = e.obs || ''; 
+                document.getElementById('btnDeleteEvent').classList.remove('hidden'); 
+            } else { 
+                document.getElementById('calendarForm').reset(); 
+                document.getElementById('calEventId').value = ''; 
+                document.getElementById('calEventDate').valueAsDate = new Date(); 
+                document.getElementById('btnDeleteEvent').classList.add('hidden'); 
+            }
+            toggleModal('calendarModal');
+        };
+
+        window.saveCalendarEvent = async () => {
+            const id = document.getElementById('calEventId').value || Date.now().toString();
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'calendar_events', id), { name: document.getElementById('calEventName').value, area: document.getElementById('calEventArea').value, prazo: document.getElementById('calEventDate').value, obs: document.getElementById('calEventObs').value });
+            toggleModal('calendarModal');
+        };
+
+        window.deleteCalendarEvent = async () => { const id = document.getElementById('calEventId').value; if(id) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'calendar_events', id)); toggleModal('calendarModal'); };
+        window.getStatusColorBg = s => ({"Backlog":"bg-slate-300","Iniciado":"bg-sky-400","Em Planejamento":"bg-indigo-500","Em Execução (Dentro do Planejado)":"bg-green-500","Em Execução (Atenção)":"bg-amber-400","Em Execução (Em Risco / Atrasado)":"bg-orange-500","Crítico":"bg-red-600","Concluído":"bg-emerald-600"}[s] || "bg-slate-200");
+        window.getStatusColor = s => (s === "Concluído" || s.includes("Dentro") ? "text-green-600 bg-green-50 border-green-200" : (s === "Crítico" || s.includes("Risco") ? "text-red-600 bg-red-50 border-red-200" : (s.includes("Atenção") ? "text-amber-600 bg-amber-50 border-amber-200" : "text-slate-600 bg-slate-50 border-slate-200")));
+        window.setListFilter = f => { currentListFilter = f; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-filter')); const map = {'all':'cardTotal','Backlog':'cardBacklog','Iniciado':'cardIniciado','Em Planejamento':'cardPlanejado','Em Execução (Dentro do Planejado)':'cardExecDP','Em Execução (Atenção)':'cardExecEA','Em Execução (Em Risco / Atrasado)':'cardExecRA','Crítico':'cardCritico','Concluído':'cardConcluido'}; if(map[f]) document.getElementById(map[f]).classList.add('active-filter'); window.renderData(); };
+        
+        window.setPriorityFilter = p => { 
+            currentPriorityFilter = (currentPriorityFilter === p) ? 'all' : p; 
+            
+            document.querySelectorAll('[id^="legend-prio-"]').forEach(el => el.classList.remove('active-legend'));
+            if(currentPriorityFilter !== 'all') {
+                const map = {'Urgente':'urg', 'Alta':'high', 'Média':'mid', 'Baixa':'low'};
+                document.getElementById('legend-prio-'+map[currentPriorityFilter]).classList.add('active-legend');
+            }
+            
+            window.renderData(); 
+        };
+        
+        window.setFilter = f => { currentFilter = f; const btns = document.querySelectorAll('.coord-btn'); btns.forEach(b => b.classList.remove('active-coord')); if(f !== 'all') { document.getElementById('coordBtnContainer').classList.add('coord-list-active'); const b = document.getElementById('coord-'+f); if(b) b.classList.add('active-coord'); } else document.getElementById('coordBtnContainer').classList.remove('coord-list-active'); window.renderData(); };
+        window.updateStatusUI = s => { document.getElementById('sysStatusDot').className = `w-2 h-2 rounded-full ${s === 'online' ? 'bg-emerald-400' : 'bg-amber-400'}`; document.getElementById('sysStatusText').innerText = s === 'online' ? 'Online' : 'Sincronizando...'; };
+        
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                initListeners();
+                setTimeout(() => window.switchTab('projects'), 500); 
+                
+                const actorInput = document.getElementById('actorInput');
+                actorInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === ',') {
+                        e.preventDefault();
+                        const val = this.value.trim().replace(',', '');
+                        if(val) {
+                            const tag = document.createElement('div');
+                            tag.className = 'actor-tag';
+                            tag.innerHTML = `<span>${val}</span><i class="fas fa-times cursor-pointer hover:text-blue-800" onclick="this.parentElement.remove()"></i>`;
+                            document.getElementById('actorsTagContainer').insertBefore(tag, this);
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>
