@@ -654,9 +654,16 @@
             measurementId: "G-ESGFQTL8L5"
         };
         
+        // --- CORREÇÃO DE ESCOPO GLOBAL ---
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+
+        // Colocamos no 'window' para garantir que funções externas enxerguem
+        window.auth = getAuth(app);
+        window.db = getFirestore(app);
+
+        // Mantemos as constantes locais para o código que já existe funcionar
+        const auth = window.auth;
+        const db = window.db;
         
         // Caminho fixo para o projeto do usuário
         const appId = 'painel-gestao-main';
@@ -815,10 +822,13 @@
 
         async function initAuth() {
             try {
-                // Tenta autenticação anônima com as credenciais fornecidas
-                await signInAnonymously(auth);
+                // Use window.auth aqui para ter certeza
+                await signInAnonymously(window.auth);
             } catch (error) {
                 console.error("Firebase Auth Error:", error);
+        // ... resto do seu código de erro ...
+    }
+}
                 
                 // Atualiza a UI para mostrar erro específico
                 const statusDiv = document.getElementById('sysStatus');
@@ -1730,3 +1740,4 @@
     </script>
 </body>
 </html>
+
