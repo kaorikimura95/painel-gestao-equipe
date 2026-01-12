@@ -639,11 +639,12 @@
     </div>
 
     <script type="module">
+<script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // --- CONFIGURAÇÃO FIREBASE PERSONALIZADA ---
+        // --- CONFIGURAÇÃO FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyBVT30qEXkwHw1Le012oKnEJyAUYcwQC8U",
             authDomain: "painel-gestao-d674d.firebaseapp.com",
@@ -654,18 +655,18 @@
             measurementId: "G-ESGFQTL8L5"
         };
         
-        // --- CORREÇÃO DE ESCOPO GLOBAL ---
+        // --- INICIALIZAÇÃO CORRIGIDA (GLOBAL) ---
         const app = initializeApp(firebaseConfig);
-
-        // Colocamos no 'window' para garantir que funções externas enxerguem
+        
+        // Define auth e db no escopo global (window) para evitar erros
         window.auth = getAuth(app);
         window.db = getFirestore(app);
 
-        // Mantemos as constantes locais para o código que já existe funcionar
+        // Constantes locais para compatibilidade
         const auth = window.auth;
         const db = window.db;
         
-        // Caminho fixo para o projeto do usuário
+        // Caminho fixo para o projeto
         const appId = 'painel-gestao-main';
 
         let currentUser = null;
@@ -677,7 +678,7 @@
         let currentDate = new Date(2026, 0, 1);
         let selectedCalendarDay = null; 
 
-        // ... existing constants ...
+        // Listas e Constantes (Mantidas iguais)
         const areasList = ["DSV", "EPT", "CEC", "CET", "CGSV", "COST", "CIST", "SCCE", "SDCG", "SFP", "SIEDU", "SOPED", "SETEF", "SDMP", "SDAP", "SAST", "RENAEST", "SESV", "SMO", "SEP", "STSV", "SISV", "SIM", "SGR", "SAT", "SENT", "SFI"];
         const UNIFIED_STATUS = ["Backlog", "Iniciado", "Em Planejamento", "Em Execução (Dentro do Planejado)", "Em Execução (Atenção)", "Em Execução (Em Risco / Atrasado)", "Crítico", "Concluído"];
         
@@ -686,166 +687,26 @@
 
         let dataStore = { projects: [], contracts: [], operational: [], calendarEvents: [], indicators: [] };
 
-        const PORTARIA_DATA = [
-            { art: 'Art. 256', title: 'Diretoria de Segurança Viária', type: 'Diretoria', preamble: 'Compete dirigir, planejar, coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Segurança viária e educação para o trânsito', 'Educação corporativa e governança da aprendizagem', 'Aplicação e repasse de valores arrecadados para segurança viária', 'Estatística, estudos, pesquisas e integração de informações para segurança viária', 'Diretrizes para a fiscalização de trânsito e policiamento ostensivo', 'Integração e atuação em rede com os órgãos do Sistema Estadual de Trânsito (SISTRAN)'] },
-            { art: 'Art. 257', title: 'Escola Pública de Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Educação de crianças, adolescentes, jovens e adultos sobre legislação', 'Promoção da Política Nacional de Trânsito (PNT) e cidadania', 'Campanhas de conscientização para o trânsito seguro', 'Ações de educação para condutores profissionais', 'Gestão da educação corporativa, formação e desenvolvimento contínuo'] },
-            { art: 'Art. 258', title: 'Coordenadoria de Educação Corporativa', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Programas de capacitação e desenvolvimento profissional', 'Gestão do conhecimento organizacional', 'Avaliação de desempenho e competências', 'Programas de educação corporativa e gamificação', 'Monitoramento e avaliação de resultados de capacitação', 'Articulação com instituições de ensino e parceiros', 'Gestão das plataformas tecnológicas de ensino', 'Desenvolvimento de lideranças e gestão estratégica'] },
-            { art: 'Art. 259', title: 'Serviço de Desenvolvimento de Competências Específicas', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Mapeamento de competências técnicas', 'Elaboração de programas de treinamento específicos', 'Avaliação de aprendizagem'] },
-            { art: 'Art. 260', title: 'Serviço de Desenvolvimento de Competências Gerais', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de habilidades comportamentais', 'Implementação de programas de liderança', 'Promoção de cultura organizacional'] },
-            { art: 'Art. 261', title: 'Serviço de Formação Profissional', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de programas de formação inicial', 'Gestão de estágios e trainee', 'Implementação de programas de certificação'] },
-            { art: 'Art. 262', title: 'Coordenadoria de Educação para o Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de programas educacionais', 'Articulação com instituições de ensino', 'Promoção da cidadania no trânsito'] },
-            { art: 'Art. 263', title: 'Serviço de Integração da Educação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Articulação com instituições educacionais', 'Desenvolvimento de parcerias educativas', 'Implementação de projetos pedagógicos'] },
-            { art: 'Art. 264', title: 'Serviço de Operações de Educação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Organização de eventos educativos', 'Gestão logística de ações educacionais', 'Implementação de campanhas de trânsito'] },
-            { art: 'Art. 265', title: 'Serviço de Promoção de Educação no Ensino Fundamental', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de material didático', 'Capacitação de educadores', 'Implementação de projetos escolares'] },
-            { art: 'Art. 266', title: 'Serviço de Desenvolvimento de Motoristas Profissionais', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de programas de capacitação para motoristas profissionais', 'Avaliação de competências de condutores', 'Promoção de práticas de direção segura'] },
-            { art: 'Art. 267', title: 'Serviço de Desenvolvimento de Agentes Públicos', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Capacitação de agentes de trânsito', 'Atualização em legislação e procedimentos', 'Desenvolvimento de habilidades de fiscalização'] },
-            { art: 'Art. 268', title: 'Coordenadoria Geral de Segurança Viária', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Implementação e monitoramento dos Planos de Redução de Mortes e Lesões', 'Execução de programas e acordos de cooperação', 'Coleta e gestão de dados estatísticos sobre sinistros', 'Aplicação, transparência e prestação de contas dos investimentos'] },
-            { art: 'Art. 269', title: 'Coordenadoria do Observatório de Segurança no Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração e implantação do Plano Estadual de Segurança Viária', 'Desdobramento do Pnatrans e compartilhamento de dados', 'Análise de dados estatísticos de segurança viária', 'Produção de relatórios estatísticos', 'Desenvolvimento de indicadores de desempenho', 'Estudo de padrões e tendências em sinistros', 'Articulação com órgãos do SNT e instituições acadêmicas', 'Gestão das plataformas tecnológicas e painéis de dados'] },
-            { art: 'Art. 270', title: 'Divisão de Estatísticas de Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de banco de dados de trânsito', 'Análise estatística avançada', 'Elaboração de relatórios técnicos'] },
-            { art: 'Art. 271', title: 'Serviço de Análise de Sinistro de Trânsito', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Investigação de acidentes de trânsito', 'Análise de fatores de risco', 'Elaboração de relatórios técnicos'] },
-            { art: 'Art. 272', title: 'Serviço de Integração da Informação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de sistemas de informação', 'Integração de bases de dados', 'Desenvolvimento de ferramentas de análise'] },
-            { art: 'Art. 273', title: 'Divisão de Redução de Mortes e Lesões no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento de ações de segurança viária', 'Monitoramento de indicadores de segurança', 'Articulação intersetorial'] },
-            { art: 'Art. 274', title: 'Serviço de Estratégia de Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de estratégias de prevenção', 'Análise de eficácia de intervenções', 'Proposição de medidas de segurança'] },
-            { art: 'Art. 275', title: 'Serviço de Monitoramento', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Acompanhamento de indicadores de segurança', 'Elaboração de relatórios de desempenho', 'Identificação de tendências e padrões'] },
-            { art: 'Art. 276', title: 'Divisão de Estudos para Segurança no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de pesquisas em segurança viária', 'Avaliação de políticas públicas de trânsito', 'Proposição de inovações em segurança'] },
-            { art: 'Art. 277', title: 'Serviço de Estudos e Pesquisas', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Condução de pesquisas em segurança viária', 'Análise de tendências e comportamentos no trânsito', 'Elaboração de relatórios científicos'] },
-            { art: 'Art. 278', title: 'Serviço de Tecnologia em Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Avaliação de novas tecnologias', 'Implementação de soluções inovadoras', 'Monitoramento de tendências tecnológicas'] },
-            { art: 'Art. 279', title: 'Coordenadoria de Integração dos Sistemas de Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Articulação interinstitucional', 'Gestão de parcerias', 'Coordenação de projetos integrados'] },
-            { art: 'Art. 280', title: 'Divisão de Integração para Segurança no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de projetos interinstitucionais', 'Promoção de eventos de integração', 'Gestão de informações intersetoriais'] },
-            { art: 'Art. 281', title: 'Serviço de Integração para Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Implementação de ações integradas', 'Articulação com parceiros locais', 'Monitoramento de projetos conjuntos'] },
-            { art: 'Art. 282', title: 'Divisão do Plano Estadual de Segurança Viária', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de planos estratégicos', 'Monitoramento de metas e indicadores', 'Articulação com municípios'] },
-            { art: 'Art. 283', title: 'Serviço de Integração com os Municípios', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Articulação com gestores municipais', 'Apoio técnico a municípios', 'Promoção de ações conjuntas'] },
-            { art: 'Art. 284', title: 'Serviço de Gestão de Recursos', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento orçamentário', 'Gestão financeira de projetos', 'Prestação de contas'] },
-            { art: 'Art. 285', title: 'Serviço de Análise Técnica', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Avaliação técnica de projetos', 'Elaboração de pareceres técnicos', 'Suporte à tomada de decisões'] },
-            { art: 'Art. 286', title: 'Divisão de Engenharia de Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento de infraestrutura viária', 'Análise de projetos de engenharia de tráfego', 'Proposição de melhorias viárias'] },
-            { art: 'Art. 287', title: 'Serviço de Engenharia de Trânsito', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de projetos de sinalização', 'Análise de segurança viária', 'Proposição de intervenções físicas'] },
-            { art: 'Art. 288', title: 'Serviço de Fiscalização de Intervenções', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de contratos e fiscalização de obras', 'Avaliação de conformidade técnica e jurídica', 'Elaboração de relatórios de inspeção'] }
-        ];
-
-        const INITIAL_INDICATORS = [
-            // Produto: RESPEITO À VIDA (Estratégico PPA)
-            { 
-                id: 'ind_5736', 
-                code: '5736', 
-                product: 'RESPEITO À VIDA',
-                name: 'NÚMERO DE MUNICÍPIOS INTEGRADOS AO SNT', 
-                meta: 75, 
-                unit: 'un', 
-                rule: 'Soma',
-                type: 'ppa',
-                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
-                ppa: { '2024': 50, '2025': 75, '2026': 75, '2027': 103 },
-                ppaRealized: { '2025': 0 }
-            },
-            { 
-                id: 'ind_5737', 
-                code: '5737', 
-                product: 'RESPEITO À VIDA',
-                name: 'TAXA DE ÓBITOS POR SINISTROS (/100k hab)', 
-                meta: 9.55, 
-                unit: '/100k hab', 
-                rule: 'Último valor',
-                type: 'ppa',
-                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
-                ppa: { '2024': 10.18, '2025': 9.87, '2026': 9.55, '2027': 9.24 },
-                ppaRealized: { '2025': 0 }
-            },
-            // Produto: CAPACITAÇÃO (Estratégico PPA)
-            { 
-                id: 'ind_5801', 
-                code: '5801', 
-                product: 'CAPACITAÇÃO, EDUCAÇÃO E DADOS',
-                name: 'NÚMERO DE VAGAS OFERECIDAS (EPT/CONTRATOS)', 
-                meta: 228131, 
-                unit: 'un', 
-                rule: 'Último valor',
-                type: 'ppa', 
-                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
-                ppa: { '2024': 172500, '2025': 198375, '2026': 228131, '2027': 330789 },
-                ppaRealized: { '2025': 0 }
-            },
-            { 
-                id: 'ind_5802', 
-                code: '5802', 
-                product: 'CAPACITAÇÃO, EDUCAÇÃO E DADOS',
-                name: 'PERCENTUAL DE CERTIFICADOS EMITIDOS', 
-                meta: 90, 
-                unit: '%', 
-                rule: 'Último valor',
-                type: 'ppa',
-                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
-                ppa: { '2024': 86, '2025': 88, '2026': 90, '2027': 92 },
-                ppaRealized: { '2025': 0 }
-            },
-            // OUTROS INDICADORES (Novos)
-            {
-                id: 'ind_other_01',
-                code: 'SISTRAN',
-                product: 'OUTROS INDICADORES',
-                name: 'MUNICÍPIOS INTEGRADOS AO SISTRAN',
-                meta: 0,
-                unit: 'un',
-                rule: 'Soma',
-                type: 'other',
-                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
-                ppa: { '2024': 0, '2025': 0, '2026': 0 }, // Acompanhamento 24/25/26
-                ppaRealized: { '2024': 0, '2025': 0 }
-            },
-            {
-                id: 'ind_other_02',
-                code: 'META BR',
-                product: 'META BR',
-                name: 'META BR - RESPONSABILIDADE DSV',
-                meta: 0,
-                unit: '%',
-                rule: 'Último valor',
-                type: 'other',
-                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
-                ppa: { '2026': 0 },
-                ppaRealized: {}
-            },
-            {
-                id: 'ind_other_03',
-                code: 'INFOSIGA',
-                product: 'GESTÃO DA INFORMAÇÃO',
-                name: 'NÚMERO DE ACESSOS AO INFOSIGA',
-                meta: 0,
-                unit: 'acessos',
-                rule: 'Soma',
-                type: 'other',
-                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
-                monthly_2025: [0,0,0,0,0,0,0,0,0,0,0,0], // Array para 2025
-                ppa: { '2025': 0, '2026': 0 },
-                ppaRealized: { '2025': 0 }
-            }
-        ];
+        // ... (Aqui você deve ter a constante PORTARIA_DATA e INITIAL_INDICATORS. Não apague elas!) ...
 
         async function initAuth() {
             try {
-                // Use window.auth aqui para ter certeza
+                // Tenta autenticação anônima usando a variável global
                 await signInAnonymously(window.auth);
             } catch (error) {
                 console.error("Firebase Auth Error:", error);
-                // ... resto do seu código de erro ...
-            }
-        }
                 
-                // Atualiza a UI para mostrar erro específico
                 const statusDiv = document.getElementById('sysStatus');
                 const statusText = document.getElementById('sysStatusText');
                 const statusDot = document.getElementById('sysStatusDot');
 
                 if(statusDiv) {
-                    // Torna o botão clicável e chama atenção
                     statusDiv.className = "md:mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider py-1 md:py-2 px-2 md:px-3 rounded-lg w-auto md:w-full transition-all border border-red-900/50 bg-red-50 cursor-pointer animate-pulse";
                     statusDiv.onclick = () => window.open('https://console.firebase.google.com/project/painel-gestao-d674d/authentication/providers', '_blank');
                     statusDiv.title = "Clique para ativar a Autenticação Anônima no console";
                 }
                 
-                if(statusDot) {
-                    statusDot.className = "w-2 h-2 rounded-full bg-red-600";
-                }
-
+                if(statusDot) statusDot.className = "w-2 h-2 rounded-full bg-red-600";
                 if(statusText) {
                     statusText.className = "text-red-600 hidden sm:inline font-bold";
                     statusText.innerText = "Erro Auth (Ativar)";
@@ -853,6 +714,8 @@
             }
         }
         initAuth();
+
+        // DAQUI PRA BAIXO DEVE CONTINUAR O SEU CÓDIGO (function initListeners, etc...)
 
         function initListeners() {
             ['projects', 'contracts', 'operational', 'calendar_events', 'indicators'].forEach(colName => {
@@ -1740,5 +1603,6 @@
     </script>
 </body>
 </html>
+
 
 
