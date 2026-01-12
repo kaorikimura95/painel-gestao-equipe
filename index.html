@@ -9,302 +9,632 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Open Sans', sans-serif; }
+        
         .h-dvh { height: 100dvh; }
+
         /* Modal e Scrollbars */
-        #projectModal, #indicatorModal, #calendarModal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); }
+        #projectModal, #indicatorModal { 
+            display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; 
+            background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); 
+        }
         .modal-container { max-height: 80vh; overflow-y: auto; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         nav::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
         nav::-webkit-scrollbar-track { background: transparent; }
-        /* Campos */
+
+        /* Campos de Formulário */
         .field-label { display: block; font-size: 10px; font-weight: 900; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.1em; }
         .input-style { width: 100%; background-color: white; border: 1px solid #dbeafe; border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; outline: none; transition: all 0.2s; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); appearance: none; color: #0f172a; font-weight: 400; }
         .input-style:focus { box-shadow: 0 0 0 2px #3b82f6; border-color: transparent; }
+
         .tag-container { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem 1rem; border: 1px solid #dbeafe; border-radius: 0.75rem; min-height: 44px; transition: all 0.2s; cursor: text; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); background-color: #ffffff !important; align-items: center; }
+        .tag-container:focus-within { box-shadow: 0 0 0 2px #3b82f6; }
+
         .actor-tag { background-color: #dbeafe; color: #1d4ed8; font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.5rem; border-radius: 0.375rem; display: flex; align-items: center; gap: 0.5rem; border: 1px solid #bfdbfe; }
         .form-section-title { display: flex; align-items: center; gap: 0.5rem; color: #1e293b; font-weight: 900; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.75rem; margin-bottom: 1.5rem; }
         .doc-link-container { display: flex; align-items: center; justify-content: center; border: 2px dashed #bfdbfe; border-radius: 0.75rem; padding: 0.75rem; background-color: rgba(239, 246, 255, 0.3); transition: all 0.2s; cursor: pointer; color: #3b82f6; font-weight: 700; font-size: 0.75rem; gap: 0.75rem; }
         .doc-link-container:hover { background-color: #eff6ff; border-color: #60a5fa; }
         .hidden-field { display: none !important; }
+
         .radio-group { display: flex; gap: 1rem; padding: 0.75rem; background-color: white; border: 1px solid #dbeafe; border-radius: 0.75rem; }
         .radio-option { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.875rem; font-weight: 500; color: #334155; }
-        /* Abas e Temas */
+
+        /* Botões de Abas */
         .tab-btn { color: #94a3b8; transition: all 0.2s; }
         .tab-btn:hover { background-color: #1e293b; color: white; }
+        
         .btn-theme-project { color: #94a3b8; } .btn-theme-project:hover { color: #2563eb; border-color: #93c5fd; }
         .btn-theme-contract { color: #94a3b8; } .btn-theme-contract:hover { color: #9333ea; border-color: #d8b4fe; }
         .btn-theme-operational { color: #94a3b8; } .btn-theme-operational:hover { color: #ea580c; border-color: #fdba74; }
         .btn-theme-portaria { color: #94a3b8; } .btn-theme-portaria:hover { color: #0891b2; border-color: #67e8f9; }
         .btn-theme-indicators { color: #94a3b8; } .btn-theme-indicators:hover { color: #be185d; border-color: #fbcfe8; }
+
         /* Acordeão */
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease; }
         .accordion-row.active .accordion-content { max-height: 3000px; padding-bottom: 2rem; }
         .accordion-row.active .chevron-icon { transform: rotate(180deg); }
-        /* Portaria */
+
+        /* --- ESTILOS DA PORTARIA --- */
         .portaria-card { background-color: white; border-width: 1px; border-style: solid; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); transition: all 0.2s; position: relative; overflow: hidden; }
         .portaria-card:hover { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
         .portaria-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        
+        /* Tipos de Portaria */
         .type-diretoria { border-color: #e2e8f0; } .type-diretoria::before { background-color: #1e293b; }
         .badge-diretoria { background-color: #f1f5f9; color: #1e293b; border: 1px solid #e2e8f0; }
+        
         .type-coordenadoria { border-color: #dbeafe; } .type-coordenadoria::before { background-color: #3b82f6; }
         .badge-coordenadoria { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
+        
         .type-divisao { border-color: #e0e7ff; } .type-divisao::before { background-color: #6366f1; }
         .badge-divisao { background-color: #eef2ff; color: #4338ca; border: 1px solid #e0e7ff; }
+        
         .type-servico { border-color: #f1f5f9; } .type-servico::before { background-color: #cbd5e1; }
         .badge-servico { background-color: #f8fafc; color: #64748b; border: 1px solid #f1f5f9; }
+
         .portaria-badge { font-size: 10px; font-weight: 900; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; letter-spacing: 0.05em; }
-        .portaria-filter-btn { height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: white; box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1); transition: all 0.2s; opacity: 0.7; cursor: pointer; width: 100%; filter: grayscale(80%); transform: scale(0.98); }
-        .portaria-filter-btn:hover, .portaria-filter-btn.active { opacity: 1; filter: grayscale(0%); transform: scale(1); border: 2px solid white; outline: 2px solid currentColor; }
-        .filter-all { background-color: #475569; } .filter-diretoria { background-color: #0f172a; } .filter-coordenadoria { background-color: #2563eb; } .filter-divisao { background-color: #7c3aed; } .filter-servico { background-color: #059669; }
-        /* Cards Estatisticas */
+
+        /* --- BOTÕES DE FILTRO DA PORTARIA (AUMENTADOS) --- */
+        .portaria-filter-btn {
+            height: 42px; /* Reduzido de 80px para 42px para ficar "mais fino" */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.5rem; /* Ajuste sutil no raio da borda */
+            font-size: 11px; /* Fonte ajustada para a nova altura */
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom-width: 0;
+            opacity: 0.7;
+            cursor: pointer;
+            width: 100%;
+            filter: grayscale(80%);
+            transform: scale(0.98);
+        }
+
+        .portaria-filter-btn:hover { opacity: 1; filter: grayscale(0%); transform: scale(1); }
+
+        .portaria-filter-btn.active {
+            opacity: 1;
+            filter: grayscale(0%);
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 2px solid white;
+            outline: 2px solid currentColor;
+            outline-offset: 1px;
+        }
+
+        .filter-all { background-color: #475569; color: white; }
+        .filter-diretoria { background-color: #0f172a; color: white; }
+        .filter-coordenadoria { background-color: #2563eb; color: white; }
+        .filter-divisao { background-color: #7c3aed; color: white; }
+        .filter-servico { background-color: #059669; color: white; }
+
+        /* Calendário e Gráficos */
+        .calendar-new-wrapper { background-color: white; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); border: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden; }
+        .calendar-new-header { background-color: white; border-bottom: 1px solid #f1f5f9; padding: 1.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; gap: 0.75rem; }
+        .calendar-new-main { padding: 1rem; overflow-x: auto; display: flex; justify-content: center; }
+        #calendarGrid { min-height: 550px; min-width: 800px; }
+        
+        .calendar-new-day-cell { min-height: 120px; background-color: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; transition: all 0.2s; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative; cursor: default; }
+        .calendar-new-day-cell:hover { border-color: #60a5fa; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .calendar-day-active { background-color: #eff6ff !important; border-color: #3b82f6 !important; box-shadow: inset 0 0 0 1px #3b82f6; }
+        .calendar-new-day-empty { min-height: 120px; background-color: #f8fafc; border: 1px solid transparent; border-radius: 0.5rem; }
+
+        .chart-pie { width: 100px; height: 100px; border-radius: 50%; transition: all 0.5s ease; }
+        
         .stat-card { cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; min-height: 80px; display: flex; flex-direction: column; justify-content: center; }
         .stat-card:hover { transform: translateY(-4px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        
         .stat-card.active-filter { box-shadow: 0 0 0 3px #60a5fa; border-color: transparent; background-color: #eff6ff; transform: scale(1.02); z-index: 10; }
-        .coord-btn { transition: all 0.3s ease; opacity: 1; }
-        .coord-btn.active-coord { background-color: #2563eb !important; color: white !important; transform: scale(1.1); z-index: 10; }
+        .operational-theme .stat-card.active-filter { box-shadow: 0 0 0 3px #fb923c; background-color: #fff7ed; }
+        .contracts-theme .stat-card.active-filter { box-shadow: 0 0 0 3px #c084fc; background-color: #faf5ff; }
+        .portaria-theme .stat-card.active-filter { box-shadow: 0 0 0 3px #22d3ee; background-color: #ecfeff; }
+
+        .coord-btn { transition: all 0.3s ease; border: 1px solid transparent; opacity: 1; }
+        .coord-btn.active-coord { background-color: #2563eb !important; color: white !important; border-color: #60a5fa !important; box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.5) !important; transform: scale(1.1); opacity: 1 !important; z-index: 10; }
         #coordBtnContainer.coord-list-active .coord-btn:not(.active-coord) { opacity: 0.4; filter: grayscale(100%); transform: scale(0.95); }
-        .chart-pie { width: 100px; height: 100px; border-radius: 50%; }
-        /* Indicadores */
-        .indicator-card { background: white; border: 1px solid #fbcfe8; border-radius: 1rem; padding: 1.5rem; transition: all 0.2s; position: relative; overflow: hidden; cursor: pointer; }
-        .indicator-card:hover { transform: translateY(-2px); border-color: #f9a8d4; }
-        .indicator-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #be185d; }
-        .month-cell { background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 0.375rem; padding: 0.25rem; text-align: center; }
-        .month-label { font-size: 9px; font-weight: 900; color: #9d174d; text-transform: uppercase; }
-        .month-value { font-size: 11px; font-weight: bold; color: #831843; }
-        .progress-bg { background: #fce7f3; border-radius: 999px; height: 8px; width: 100%; overflow: hidden; margin-top: 0.5rem; }
-        .progress-fill { background: #db2777; height: 100%; border-radius: 999px; }
-        .ppa-year-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; text-align: center; }
-        .ppa-year-box.current { background-color: #fdf2f8; border-color: #fbcfe8; }
-        /* Calendar */
-        .calendar-new-wrapper { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; }
-        .calendar-new-day-cell { min-height: 120px; background: white; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; }
-        .calendar-day-active { background-color: #eff6ff !important; border-color: #3b82f6 !important; }
+        #coordBtnContainer.coord-list-active .coord-btn:not(.active-coord):hover { opacity: 1; filter: grayscale(0%); background-color: #1e293b; color: #cbd5e1; transform: scale(1); }
+        
+        /* Legenda como Botões */
+        .chart-legend-item { cursor: pointer; transition: all 0.2s; padding: 0.25rem 0.5rem; border-radius: 0.5rem; opacity: 0.5; filter: grayscale(100%); border: 1px solid transparent; }
+        .chart-legend-item:hover { opacity: 0.8; background-color: #f1f5f9; filter: grayscale(0); border-color: #cbd5e1; }
+        .chart-legend-item.active-legend { background-color: #eff6ff; border-color: #bfdbfe; font-weight: 900; opacity: 1; filter: grayscale(0); transform: scale(1.02); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .chart-legend-container:not(.has-filter) .chart-legend-item { opacity: 1; filter: grayscale(0); }
+
+        .legend-section-title { font-size: 0.875rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #1e293b; margin-bottom: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; }
+        .legend-item-title { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.25rem; display: flex; align-items: center; letter-spacing: -0.025em; }
+        .legend-item-desc { font-size: 10px; color: #64748b; line-height: 1.25; font-weight: 500; }
+        .legend-badge { display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: 50%; margin-right: 0.75rem; flex-shrink: 0; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border: 1px solid rgba(0,0,0,0.05); }
+        
         .responsive-stats-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, 1fr); }
         @media (min-width: 640px) { .responsive-stats-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1280px) { .responsive-stats-grid { grid-template-columns: repeat(5, 1fr); } }
+
+        /* Estilo Indicadores */
+        .indicator-card { background: white; border: 1px solid #fbcfe8; border-radius: 1rem; padding: 1.5rem; transition: all 0.2s; position: relative; overflow: hidden; }
+        .indicator-card:hover { box-shadow: 0 10px 15px -3px rgba(190, 24, 93, 0.1), 0 4px 6px -4px rgba(190, 24, 93, 0.1); border-color: #f9a8d4; transform: translateY(-2px); cursor: pointer; }
+        .indicator-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #be185d; }
+        .month-cell { background: #fdf2f8; border: 1px solid #fbcfe8; border-radius: 0.375rem; padding: 0.25rem; text-align: center; }
+        .month-label { font-size: 9px; font-weight: 900; color: #9d174d; text-transform: uppercase; margin-bottom: 2px; }
+        .month-value { font-size: 11px; font-bold; color: #831843; }
+        .progress-bg { background: #fce7f3; border-radius: 999px; height: 8px; width: 100%; overflow: hidden; margin-top: 0.5rem; }
+        .progress-fill { background: #db2777; height: 100%; border-radius: 999px; transition: width 0.5s ease-out; }
+        
+        /* Novo estilo para anos do PPA */
+        .ppa-year-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 0.5rem; padding: 0.5rem; text-align: center; }
+        .ppa-year-box.current { background-color: #fdf2f8; border-color: #fbcfe8; box-shadow: 0 0 0 1px #fbcfe8; }
+        .ppa-year-label { font-size: 10px; font-black; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+        .ppa-year-box.current .ppa-year-label { color: #be185d; }
+        .ppa-year-value { font-size: 12px; font-bold; color: #334155; }
+        .ppa-year-box.current .ppa-year-value { color: #be185d; }
+        .ppa-subtext { font-size: 9px; color: #94a3b8; margin-top: 2px; font-weight: 500; }
     </style>
 </head>
 <body id="mainBody" class="bg-slate-50 text-slate-900 text-sm overflow-hidden">
 
-    <div id="projectModal" class="items-center justify-center p-2 sm:p-4">
+    <!-- Modal (Universal) -->
+    <div id="projectModal" class="items-center justify-center p-2 sm:p-4" style="display: none;">
         <div class="bg-white rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden border border-slate-200 flex flex-col max-h-[95vh] sm:max-h-[90vh]">
             <div class="px-4 sm:px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center shadow-lg"><i class="fas fa-project-diagram"></i></div>
-                    <h3 id="modalTitle" class="font-black text-slate-800 uppercase">Novo Registro</h3>
+                    <div id="modalIcon" class="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-blue-100 transition-colors">
+                        <i id="modalIconImg" class="fas fa-project-diagram text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="modalTitle" class="font-black text-slate-800 uppercase tracking-tight text-sm sm:text-base">Novo Registro</h3>
+                    </div>
                 </div>
-                <button onclick="toggleModal('projectModal')" class="w-10 h-10 rounded-full hover:bg-slate-100"><i class="fas fa-times"></i></button>
+                <button onclick="toggleModal('projectModal')" class="w-10 h-10 rounded-full bg-slate-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center">
+                    <i class="fas fa-times text-base"></i>
+                </button>
             </div>
             <div class="modal-container flex-1 overflow-y-auto">
                 <form id="projectForm" class="p-4 md:p-8">
                     <input type="hidden" id="editId">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-                        <div class="space-y-6">
-                            <h4 class="form-section-title">01. Identificação</h4>
-                            <div id="contractTypeField" class="hidden-field"><label class="field-label">Tipo</label><select id="projType" class="input-style"><option value="Contrato">Contrato</option><option value="Convênio">Convênio</option></select></div>
-                            <div><label class="field-label">Nome</label><input type="text" id="projName" class="input-style" required></div>
-                            <div><label class="field-label">Descrição</label><textarea id="projDesc" rows="3" class="input-style"></textarea></div>
-                            <div><label class="field-label">Observações</label><textarea id="projObs" rows="2" class="input-style"></textarea></div>
-                            
-                            <div id="contractRelationWrapper" class="hidden-field pt-3 border-t border-slate-100">
-                                <label class="field-label">Relação com Projeto?</label>
-                                <div class="radio-group"><label class="radio-option"><input type="radio" name="contractRelType" value="nao" checked onclick="toggleContractRelInput()"> Não</label><label class="radio-option"><input type="radio" name="contractRelType" value="sim" onclick="toggleContractRelInput()"> Sim</label></div>
+                        <!-- Identificação -->
+                        <div class="space-y-8">
+                            <div class="bg-slate-50 p-4 sm:p-6 rounded-3xl border border-slate-100 space-y-5">
+                                <h4 class="form-section-title"><strong>01. Identificação</strong></h4>
+                                <div id="contractTypeField" class="flex flex-col hidden-field">
+                                    <label class="field-label">Tipo de Objeto</label>
+                                    <select id="projType" class="input-style"><option value="Contrato">Contrato</option><option value="Convênio">Convênio</option></select>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label id="labelName" class="field-label">Nome do Registro</label>
+                                    <input type="text" id="projName" required class="input-style">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="field-label">Descrição / Escopo</label>
+                                    <textarea id="projDesc" rows="3" class="input-style resize-none"></textarea>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="field-label">Observações Gerais</label>
+                                    <textarea id="projObs" rows="3" class="input-style resize-none" placeholder="Informações adicionais..."></textarea>
+                                </div>
+                                <div id="contractRelationWrapper" class="flex flex-col hidden-field space-y-3 pt-3 border-t border-slate-100">
+                                    <label class="field-label">Relação com Projeto?</label>
+                                    <div class="radio-group flex-col sm:flex-row">
+                                        <label class="radio-option"><input type="radio" name="contractRelType" value="nao" checked onclick="toggleContractRelInput()"> Não</label>
+                                        <label class="radio-option"><input type="radio" name="contractRelType" value="sim" onclick="toggleContractRelInput()"> Sim</label>
+                                    </div>
+                                </div>
+                                <div id="projectSelectWrapper" class="hidden-field animate-fade-in">
+                                    <label class="field-label">Qual projeto?</label>
+                                    <select id="projRelation" class="input-style"></select>
+                                </div>
+                                <div id="resourceLogicField" class="hidden-field space-y-3 pt-3 border-t border-slate-100">
+                                    <div class="flex flex-col"><label class="field-label">Repasse de recurso?</label><select id="projHasResource" class="input-style" onchange="toggleResourceInput()"><option value="Não">Não</option><option value="Sim">Sim</option></select></div>
+                                    <div id="resourceValueField" class="flex flex-col hidden-field"><label class="field-label">Valor (R$)</label><input type="text" id="projResourceValue" class="input-style text-emerald-600 font-bold" placeholder="0,00" oninput="this.value = this.value.replace(/[^0-9,.]/g, '')"></div>
+                                </div>
+                                <div id="relationalField" class="flex flex-col hidden-field space-y-3">
+                                    <label class="field-label">Origem</label>
+                                    <div class="radio-group flex-col sm:flex-row">
+                                        <label class="radio-option"><input type="radio" name="originType" value="pontual" checked onclick="toggleOriginInput()"> Pontual</label>
+                                        <label class="radio-option"><input type="radio" name="originType" value="projeto" onclick="toggleOriginInput()"> Projeto</label>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col" id="managerField">
+                                    <label id="labelManager" class="field-label">Gestor Responsável</label>
+                                    <input type="text" id="projManager" class="input-style">
+                                </div>
+                                <div class="flex flex-col" id="actorsField">
+                                    <label class="field-label">Atores</label>
+                                    <div class="tag-container bg-white" id="actorsTagContainer">
+                                        <input type="text" id="actorInput" class="bg-transparent outline-none text-sm font-normal flex-1 min-w-[120px] placeholder-slate-400" style="color: #0f172a;" placeholder="Digite + Enter ou Espaço">
+                                    </div>
+                                </div>
                             </div>
-                            <div id="projectSelectWrapper" class="hidden-field"><label class="field-label">Qual projeto?</label><select id="projRelation" class="input-style"></select></div>
-                            
-                            <div id="resourceLogicField" class="hidden-field pt-3 border-t border-slate-100">
-                                <label class="field-label">Repasse de recurso?</label><select id="projHasResource" class="input-style" onchange="toggleResourceInput()"><option value="Não">Não</option><option value="Sim">Sim</option></select>
-                            </div>
-                            <div id="resourceValueField" class="hidden-field"><label class="field-label">Valor (R$)</label><input type="text" id="projResourceValue" class="input-style text-emerald-600 font-bold" placeholder="0,00"></div>
-
-                            <div id="relationalField" class="hidden-field"><label class="field-label">Origem</label><div class="radio-group"><label class="radio-option"><input type="radio" name="originType" value="pontual" checked onclick="toggleOriginInput()"> Pontual</label><label class="radio-option"><input type="radio" name="originType" value="projeto" onclick="toggleOriginInput()"> Projeto</label></div></div>
-                            <div><label class="field-label">Gestor</label><input type="text" id="projManager" class="input-style"></div>
-                            <div><label class="field-label">Atores</label><div class="tag-container" id="actorsTagContainer"><input type="text" id="actorInput" class="bg-transparent outline-none flex-1 min-w-[100px]" placeholder="Digite + Enter"></div></div>
                         </div>
-                        <div class="space-y-6">
-                            <h4 class="form-section-title">02. Processos e Prazos</h4>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><label class="field-label">Prioridade</label><select id="projPriority" class="input-style"><option value="Média">Média</option><option value="Alta">Alta</option><option value="Urgente">Urgente</option><option value="Baixa">Baixa</option></select></div>
-                                <div><label class="field-label">SEI</label><input type="text" id="projSei" class="input-style"></div>
-                                <div><label class="field-label">Prazo</label><input type="date" id="projPrazo" class="input-style"></div>
-                                <div id="operationalDurationField" class="hidden-field"><label class="field-label">Duração (Dias)</label><input type="number" id="projDuration" class="input-style"></div>
+                        <!-- Processos -->
+                        <div class="space-y-8">
+                            <div class="bg-slate-50 p-4 sm:p-6 rounded-3xl border border-slate-100 space-y-5">
+                                <h4 class="form-section-title"><strong>02. Processos e Prazos</strong></h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                    <div id="priorityField" class="flex flex-col">
+                                        <label class="field-label">Prioridade</label>
+                                        <select id="projPriority" class="input-style"><option value="Urgente">Urgente</option><option value="Alta">Alta</option><option value="Média" selected>Média</option><option value="Baixa">Baixa</option></select>
+                                    </div>
+                                    <div class="flex flex-col" id="seiField">
+                                        <label class="field-label">Processo SEI</label>
+                                        <input type="text" id="projSei" class="input-style">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label id="labelPrazo" class="field-label">Prazo Final</label>
+                                        <input type="date" id="projPrazo" class="input-style">
+                                    </div>
+                                    <!-- NOVO CAMPO: DURAÇÃO (DIAS) -->
+                                    <div class="flex flex-col hidden-field" id="operationalDurationField">
+                                        <label class="field-label">Duração (Dias)</label>
+                                        <input type="number" id="projDuration" class="input-style" placeholder="Ex: 5" min="0">
+                                    </div>
+                                </div>
+                                <div class="flex flex-col" id="docsField">
+                                    <label class="field-label">Link Documentos</label>
+                                    <div class="doc-link-container" onclick="document.getElementById('projDocs').focus()">
+                                        <i class="fas fa-link"></i><input type="text" id="projDocs" class="bg-transparent outline-none flex-1 text-slate-600" placeholder="URL SharePoint/Drive">
+                                    </div>
+                                </div>
                             </div>
-                            <div><label class="field-label">Link Docs</label><div class="doc-link-container"><input type="text" id="projDocs" class="bg-transparent outline-none flex-1 text-center" placeholder="URL SharePoint/Drive"></div></div>
-                            
-                            <h4 class="form-section-title mt-6">03. Acompanhamento</h4>
-                            <div><label class="field-label">Coordenação</label><select id="projCoord" class="input-style"><option value="EPT">EPT</option><option value="CEC">CEC</option><option value="CET">CET</option><option value="CGSV">CGSV</option><option value="COST">COST</option><option value="CIST">CIST</option></select></div>
-                            <div id="serviceField" class="hidden-field"><label class="field-label">Serviço</label><select id="projService" class="input-style"><option value="SCCE">SCCE</option><option value="SDCG">SDCG</option><option value="SFP">SFP</option><option value="SIEDU">SIEDU</option><option value="SOPED">SOPED</option><option value="SETEF">SETEF</option><option value="SDMP">SDMP</option><option value="SDAP">SDAP</option><option value="SAST">SAST</option><option value="RENAEST">RENAEST</option><option value="SESV">SESV</option><option value="SMO">SMO</option><option value="SEP">SEP</option><option value="STSV">STSV</option><option value="SISV">SISV</option><option value="SIM">SIM</option><option value="SGR">SGR</option><option value="SAT">SAT</option><option value="SENT">SENT</option><option value="SFI">SFI</option></select></div>
-                            <div><label class="field-label">Status</label><select id="projStatus" class="input-style" onchange="toggleRiskInput()"></select></div>
-                            <div id="riskField" class="hidden-field"><label class="field-label text-red-600">Riscos</label><textarea id="projRisks" rows="2" class="input-style bg-red-50 border-red-200"></textarea></div>
+                            <div class="bg-slate-50 p-4 sm:p-6 rounded-3xl border border-slate-100 space-y-5">
+                                <h4 class="form-section-title"><strong>03. Acompanhamento</strong></h4>
+                                <div class="grid grid-cols-1 gap-5">
+                                    <div class="flex flex-col">
+                                        <label class="field-label">Coordenação</label>
+                                        <select id="projCoord" class="input-style"><option value="EPT">EPT</option><option value="CEC">CEC</option><option value="CET">CET</option><option value="CGSV">CGSV</option><option value="COST">COST</option><option value="CIST">CIST</option></select>
+                                    </div>
+                                    <div id="serviceField" class="flex flex-col hidden-field">
+                                        <label class="field-label">Serviço</label>
+                                        <select id="projService" class="input-style"><option value="SCCE">SCCE</option><option value="SDCG">SDCG</option><option value="SFP">SFP</option><option value="SIEDU">SIEDU</option><option value="SOPED">SOPED</option><option value="SETEF">SETEF</option><option value="SDMP">SDMP</option><option value="SDAP">SDAP</option><option value="SAST">SAST</option><option value="RENAEST">RENAEST</option><option value="SESV">SESV</option><option value="SMO">SMO</option><option value="SEP">SEP</option><option value="STSV">STSV</option><option value="SISV">SISV</option><option value="SIM">SIM</option><option value="SGR">SGR</option><option value="SAT">SAT</option><option value="SENT">SENT</option><option value="SFI">SFI</option></select>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="field-label">Status</label>
+                                        <select id="projStatus" class="input-style" onchange="toggleRiskInput()"></select>
+                                    </div>
+                                    <!-- NOVO CAMPO DE RISCOS -->
+                                    <div id="riskField" class="flex flex-col hidden-field animate-fade-in">
+                                        <label class="field-label text-red-600"><i class="fas fa-exclamation-triangle mr-1"></i> Riscos e Pontos de Atenção</label>
+                                        <textarea id="projRisks" rows="3" class="input-style resize-none border-red-200 bg-red-50 focus:ring-red-200 placeholder-red-300 text-red-900" placeholder="Descreva os riscos, impedimentos ou motivos do atraso..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div id="roadmapSection" class="mt-6">
-                        <div class="flex justify-between items-center mb-2"><h4 class="form-section-title mb-0 border-0">04. Roadmap</h4><button type="button" onclick="addRoadmapRow()" class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded font-bold hover:bg-blue-200">+ Etapa</button></div>
-                        <div id="roadmapContainer" class="space-y-2"></div>
+                    <div id="roadmapSection" class="mt-6 space-y-5">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="form-section-title !mb-0 !border-0"><strong>04. Roadmap</strong></h4>
+                            <button type="button" onclick="addRoadmapRow()" id="addRoadmapBtn" class="text-[10px] font-black bg-blue-600 text-white px-4 py-2 rounded-xl shadow-md uppercase transition-colors">+ Nova Etapa</button>
+                        </div>
+                        <div id="roadmapContainer" class="space-y-3"></div>
                     </div>
-                    
-                    <div class="mt-8 flex gap-4 pt-4 border-t border-slate-100">
-                        <button type="button" id="btnDeleteProject" onclick="deleteProject()" class="hidden px-6 py-3 bg-red-50 text-red-600 rounded-xl font-bold text-xs uppercase hover:bg-red-100 border border-red-100"><i class="fas fa-trash-alt mr-2"></i> Excluir</button>
-                        <button type="button" onclick="saveProject()" class="flex-1 bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 uppercase text-xs tracking-widest shadow-lg">Gravar Dados</button>
+                    <div class="mt-12 flex gap-4 pb-8">
+                        <button type="button" id="deleteBtn" onclick="deleteProject()" class="bg-red-50 text-red-600 font-bold px-6 rounded-2xl shadow-sm hover:bg-red-100 transition-all uppercase text-xs tracking-widest hidden"><i class="fas fa-trash mr-2"></i> Excluir</button>
+                        <button type="button" id="saveBtn" onclick="saveProject()" class="flex-1 bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-xl hover:bg-blue-700 transition-all uppercase text-xs tracking-[0.2em]">Gravar Dados</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div id="indicatorModal" class="items-center justify-center p-2 sm:p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl border border-slate-200 flex flex-col max-h-[90vh]">
+    <!-- Modal Edição Indicador -->
+    <div id="indicatorModal" class="items-center justify-center p-2 sm:p-4" style="display: none;">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
             <div class="bg-gradient-to-r from-pink-600 to-rose-500 px-6 py-4 flex justify-between items-center text-white shrink-0">
-                <h3 class="font-black uppercase">Atualizar Indicador</h3>
-                <button onclick="toggleModal('indicatorModal')"><i class="fas fa-times"></i></button>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-chart-line text-lg"></i>
+                    <h3 class="font-black uppercase tracking-tight">Atualizar Indicador</h3>
+                </div>
+                <button onclick="toggleModal('indicatorModal')" class="hover:text-pink-200 transition-colors"><i class="fas fa-times"></i></button>
             </div>
             <div class="p-6 overflow-y-auto">
                 <form id="indicatorForm">
                     <input type="hidden" id="indId">
-                    <h4 id="indNameDisplay" class="text-lg font-black text-slate-800 mb-1">Nome</h4>
-                    <p class="text-xs text-slate-500 font-bold uppercase mb-6">Meta: <span id="indMetaDisplay" class="text-pink-600"></span></p>
-                    
-                    <div id="indPpaSection" class="hidden mb-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
-                        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-200 pb-1">Histórico PPA</h5>
+                    <div class="mb-6">
+                        <h4 id="indNameDisplay" class="text-lg font-black text-slate-800 leading-tight mb-1">Nome do Indicador</h4>
+                        <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Meta Anual 2026: <span id="indMetaDisplay" class="text-pink-600">0</span></p>
+                    </div>
+
+                    <!-- Seção PPA Dinâmica (Preenchida via JS) -->
+                    <div id="indPpaSection" class="hidden mb-8 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-200 pb-2">Histórico PPA (2024-2027)</h5>
                         <div id="indPpaGrid" class="grid grid-cols-2 gap-4"></div>
                     </div>
                     
-                    <div id="indMonths2025Wrapper" class="hidden mb-6 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-                        <h5 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-2 border-b border-indigo-200 pb-1">2025 (Histórico)</h5>
-                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="indMonthsGrid2025"></div>
+                    <!-- NOVA SEÇÃO: Lançamento Mensal 2025 -->
+                    <div id="indMonths2025Wrapper" class="hidden mb-8 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <h5 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4 border-b border-indigo-200 pb-2">Lançamento Mensal 2025 (Histórico)</h5>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 gap-4" id="indMonthsGrid2025">
+                            <!-- Gerado via JS -->
+                        </div>
                     </div>
                     
-                    <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 border-b border-slate-100 pb-1">2026 (Realizado)</h5>
-                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2" id="indMonthsGrid"></div>
+                    <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">Lançamento Mensal 2026 (Realizado)</h5>
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-4" id="indMonthsGrid">
+                        <!-- Gerado via JS -->
+                    </div>
                     
-                    <div class="mt-6 flex justify-end">
-                        <button type="button" onclick="saveIndicator()" class="bg-pink-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-pink-700 uppercase text-xs">Salvar</button>
+                    <div class="mt-8 flex justify-end">
+                        <button type="button" onclick="saveIndicator()" class="bg-pink-600 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-pink-200 hover:bg-pink-700 transition-all uppercase text-xs tracking-widest">Salvar Lançamentos</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <div id="calendarModal" class="items-center justify-center p-2 sm:p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg border border-slate-200 flex flex-col">
-            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center shrink-0">
-                 <h3 class="font-black text-slate-800 uppercase">Evento</h3>
-                 <button onclick="toggleModal('calendarModal')" class="w-8 h-8 rounded-full hover:bg-slate-100"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6">
-                <form id="calendarForm" class="space-y-4">
-                    <input type="hidden" id="calEventId">
-                    <div><label class="field-label">Título</label><input type="text" id="calEventName" class="input-style" required></div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div><label class="field-label">Data</label><input type="date" id="calEventDate" class="input-style" required></div>
-                        <div><label class="field-label">Área</label><select id="calEventArea" class="input-style"></select></div>
-                    </div>
-                    <div><label class="field-label">Obs</label><textarea id="calEventObs" rows="2" class="input-style"></textarea></div>
-                    <div class="flex gap-3 pt-4">
-                        <button type="button" id="btnDeleteEvent" onclick="deleteCalendarEvent()" class="px-4 py-3 bg-red-50 text-red-600 rounded-xl font-bold text-xs uppercase hover:bg-red-100 hidden"><i class="fas fa-trash"></i></button>
-                        <button type="button" onclick="saveCalendarEvent()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 uppercase text-xs">Salvar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+    <!-- App Shell -->
     <div id="appShell" class="flex flex-col md:flex-row h-dvh md:h-screen overflow-hidden">
+        
+        <!-- Sidebar -->
         <aside class="w-full md:w-64 bg-slate-900 text-white flex flex-col shadow-xl shrink-0 z-30 h-auto md:h-full">
-            <div class="p-4 border-b border-slate-800">
-                <h1 class="text-xl font-bold uppercase">DSV <span class="text-blue-400">2026</span></h1>
-                <div id="sysStatus" class="mt-4 flex items-center gap-2 text-[10px] font-black uppercase py-2 px-3 rounded-lg border border-slate-700 bg-slate-800">
-                    <span id="sysStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span><span id="sysStatusText" class="text-slate-400">Iniciando...</span>
+            <div class="p-3 md:p-5 border-b border-slate-800 flex justify-between md:block items-center">
+                <div>
+                    <h1 class="text-base md:text-xl font-bold tracking-tight uppercase">DSV <span class="text-blue-400">2026</span></h1>
+                    <p class="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">Painel de Gestão</p>
+                </div>
+                <div id="sysStatus" class="md:mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider py-1 md:py-2 px-2 md:px-3 rounded-lg w-auto md:w-full transition-all border border-slate-700/50 bg-slate-800">
+                    <span id="sysStatusDot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+                    <span id="sysStatusText" class="text-slate-400 hidden sm:inline">Iniciando...</span>
                 </div>
             </div>
-            <nav class="flex-1 p-2 space-y-1 overflow-y-auto">
-                <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn w-full flex items-center p-2 rounded-lg text-xs font-bold uppercase"><i class="fas fa-folder w-6"></i> Projetos</button>
-                <button onclick="switchTab('contracts')" id="tab-contracts" class="tab-btn w-full flex items-center p-2 rounded-lg text-xs font-bold uppercase"><i class="fas fa-file-contract w-6"></i> Contratos</button>
-                <button onclick="switchTab('operational')" id="tab-operational" class="tab-btn w-full flex items-center p-2 rounded-lg text-xs font-bold uppercase"><i class="fas fa-tasks w-6"></i> Operacional</button>
-                <button onclick="switchTab('indicators')" id="tab-indicators" class="tab-btn w-full flex items-center p-2 rounded-lg text-xs font-bold uppercase"><i class="fas fa-chart-line w-6"></i> Indicadores</button>
-                <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-btn w-full flex items-center p-2 rounded-lg text-xs font-bold uppercase"><i class="fas fa-calendar-alt w-6"></i> Calendário</button>
-                <button onclick="switchTab('portaria')" id="tab-portaria" class="tab-btn w-full flex items-center p-2 rounded-lg text-xs font-bold uppercase"><i class="fas fa-book w-6"></i> Portaria</button>
+            
+            <nav class="flex-1 flex md:flex-col flex-row overflow-x-auto md:overflow-y-auto px-2 py-2 md:px-3 md:mt-3 space-x-2 md:space-x-0 md:space-y-3 bg-slate-900 scrollbar-hide shrink-0 items-center md:items-stretch">
+                <div class="flex-none min-w-[140px] md:w-full">
+                    <p class="text-[10px] font-normal text-slate-500 uppercase tracking-widest mb-2 px-2 hidden md:block">Visualização</p>
+                    <div class="flex md:block space-x-2 md:space-x-0 md:space-y-1">
+                        <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-folder w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Projetos</span>
+                        </button>
+                        <button onclick="switchTab('contracts')" id="tab-contracts" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-file-contract w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Contratos</span>
+                        </button>
+                        <button onclick="switchTab('operational')" id="tab-operational" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-tasks w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Operacional</span>
+                        </button>
+                        <button onclick="switchTab('indicators')" id="tab-indicators" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-chart-line w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Indicadores</span>
+                        </button>
+                        <button onclick="switchTab('calendar')" id="tab-calendar" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-calendar-alt w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Calendário</span>
+                        </button>
+                        <button onclick="switchTab('portaria')" id="tab-portaria" class="tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap">
+                            <i class="fas fa-balance-scale w-4 text-sm md:text-base"></i><span class="text-xs md:text-sm">Portaria nº44/25</span>
+                        </button>
+                    </div>
+                </div>
                 
-                <div class="pt-4 border-t border-slate-700 mt-4">
-                    <p class="text-[10px] text-slate-500 uppercase font-black px-2 mb-2">Filtro Coordenação</p>
-                    <div id="coordBtnContainer" class="grid grid-cols-2 gap-2">
-                        <button id="coord-EPT" onclick="setFilter('EPT')" class="coord-btn bg-slate-800 p-2 rounded text-[10px] font-bold">EPT</button>
-                        <button id="coord-CEC" onclick="setFilter('CEC')" class="coord-btn bg-slate-800 p-2 rounded text-[10px] font-bold">CEC</button>
-                        <button id="coord-CET" onclick="setFilter('CET')" class="coord-btn bg-slate-800 p-2 rounded text-[10px] font-bold">CET</button>
-                        <button id="coord-CGSV" onclick="setFilter('CGSV')" class="coord-btn bg-slate-800 p-2 rounded text-[10px] font-bold">CGSV</button>
-                        <button id="coord-COST" onclick="setFilter('COST')" class="coord-btn bg-slate-800 p-2 rounded text-[10px] font-bold">COST</button>
-                        <button id="coord-CIST" onclick="setFilter('CIST')" class="coord-btn bg-slate-800 p-2 rounded text-[10px] font-bold">CIST</button>
-                        <button onclick="setFilter('all')" class="coord-btn col-span-2 bg-slate-700 p-2 rounded text-[10px] font-bold uppercase">Limpar Filtro</button>
+                <div class="flex-none min-w-[200px] md:w-full border-l md:border-l-0 border-slate-700 pl-2 md:pl-0 h-full md:h-auto flex items-center md:block">
+                    <div class="w-full">
+                        <p class="text-[10px] font-normal text-slate-500 uppercase tracking-widest mb-1 px-2 hidden md:block">Coordenações</p>
+                        <div id="coordBtnContainer" class="flex md:grid md:grid-cols-2 gap-2 px-1">
+                            <button id="coord-EPT" onclick="setFilter('EPT')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">EPT</button>
+                            <button id="coord-CEC" onclick="setFilter('CEC')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CEC</button>
+                            <button id="coord-CET" onclick="setFilter('CET')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CET</button>
+                            <button id="coord-CGSV" onclick="setFilter('CGSV')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CGSV</button>
+                            <button id="coord-COST" onclick="setFilter('COST')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">COST</button>
+                            <button id="coord-CIST" onclick="setFilter('CIST')" class="coord-btn bg-slate-800 p-2 rounded-lg text-[10px] font-bold text-white hover:bg-slate-700 min-w-[50px]">CIST</button>
+                            <button id="coord-all" onclick="setFilter('all')" class="coord-btn md:col-span-2 bg-slate-700 p-2 rounded-lg text-[10px] font-bold text-white text-center uppercase whitespace-nowrap hover:bg-slate-600">Limpar</button>
+                        </div>
                     </div>
                 </div>
             </nav>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50 relative">
-            <header class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center shadow-sm shrink-0">
-                <h2 id="viewTitle" class="text-lg font-black text-slate-800 uppercase">Visão Geral</h2>
-                <input type="text" id="searchInput" oninput="renderData()" placeholder="Pesquisar..." class="bg-slate-50 border border-slate-100 rounded-lg px-4 py-2 text-xs outline-none w-64">
+        <main class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden relative">
+            <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-4 md:py-5 flex flex-col md:flex-row justify-between items-start md:items-center shadow-sm sticky top-0 z-20 gap-3">
+                <h2 id="viewTitle" class="text-base md:text-xl font-black text-slate-800 uppercase tracking-tight">Portfólio de Projetos</h2>
+                <div class="relative w-full md:w-72">
+                    <i class="fas fa-search absolute left-3 top-3 text-slate-300 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="renderData();" placeholder="Pesquisar..." class="w-full bg-slate-50 border border-slate-100 rounded-xl pl-10 pr-3 py-2.5 text-xs outline-none focus:ring-2 focus:ring-blue-100 transition-all">
+                </div>
             </header>
 
-            <div id="contentArea" class="flex-1 overflow-y-auto p-6 pb-24">
-                <div id="standardView">
-                    <div id="statsWrapper" class="flex flex-col xl:flex-row gap-6 mb-8">
-                        <div class="flex-1 responsive-stats-grid">
-                            <div id="cardTotal" onclick="setListFilter('all')" class="stat-card bg-white p-3 rounded-xl border border-slate-200 shadow-sm active-filter"><p class="text-[9px] text-slate-400 font-black uppercase">Total</p><div id="statTotal" class="text-xl font-black text-slate-800">0</div></div>
-                            <div id="cardBacklog" onclick="setListFilter('Backlog')" class="stat-card bg-white p-3 rounded-xl border border-slate-200 shadow-sm"><p class="text-[9px] text-slate-400 font-black uppercase">Backlog</p><div id="statBacklog" class="text-xl font-black text-slate-600">0</div></div>
-                            <div id="cardIniciado" onclick="setListFilter('Iniciado')" class="stat-card bg-white p-3 rounded-xl border border-sky-200 shadow-sm"><p class="text-[9px] text-sky-600 font-black uppercase">Iniciado</p><div id="statIniciado" class="text-xl font-black text-slate-800">0</div></div>
-                            <div id="cardPlanejado" onclick="setListFilter('Em Planejamento')" class="stat-card bg-white p-3 rounded-xl border border-indigo-200 shadow-sm"><p class="text-[9px] text-indigo-600 font-black uppercase">Planejamento</p><div id="statPlanejado" class="text-xl font-black text-slate-800">0</div></div>
-                            <div id="cardExecDP" onclick="setListFilter('Em Execução (Dentro do Planejado)')" class="stat-card bg-white p-3 rounded-xl border border-green-200 shadow-sm"><p class="text-[9px] text-green-600 font-black uppercase">Execução OK</p><div id="statExecDP" class="text-xl font-black text-slate-800">0</div></div>
-                            <div id="cardExecEA" onclick="setListFilter('Em Execução (Atenção)')" class="stat-card bg-white p-3 rounded-xl border border-amber-200 shadow-sm"><p class="text-[9px] text-amber-600 font-black uppercase">Atenção</p><div id="statExecEA" class="text-xl font-black text-slate-800">0</div></div>
-                            <div id="cardCritico" onclick="setListFilter('Crítico')" class="stat-card bg-white p-3 rounded-xl border border-red-200 shadow-sm"><p class="text-[9px] text-red-600 font-black uppercase">Crítico</p><div id="statCritico" class="text-xl font-black text-slate-800">0</div></div>
-                            <div id="cardConcluido" onclick="setListFilter('Concluído')" class="stat-card bg-white p-3 rounded-xl border border-emerald-200 shadow-sm"><p class="text-[9px] text-emerald-600 font-black uppercase">Concluído</p><div id="statConcluido" class="text-xl font-black text-slate-800">0</div></div>
+            <!-- Container Principal -->
+            <div id="standardView" class="flex-1 flex flex-col transition-colors duration-300 pb-20 md:pb-0">
+                <div id="statsWrapper" class="px-4 md:px-6 pt-6 flex flex-col xl:flex-row gap-6">
+                    <div id="statsRow1" class="flex-1 responsive-stats-grid transition-all duration-500">
+                        <div id="cardTotal" onclick="setListFilter('all')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm stat-card active-filter">
+                            <p class="text-[9px] text-slate-400 uppercase font-black mb-1">Total</p><div id="statTotal" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardBacklog" onclick="setListFilter('Backlog')" class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-slate-500 uppercase font-black mb-1">Backlog</p><div id="statBacklog" class="text-xl font-black text-slate-700">0</div>
+                        </div>
+                        <div id="cardIniciado" onclick="setListFilter('Iniciado')" class="bg-white p-3 rounded-xl border border-sky-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-sky-600 uppercase font-black mb-1">Iniciado</p><div id="statIniciado" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardPlanejado" onclick="setListFilter('Em Planejamento')" class="bg-white p-3 rounded-xl border border-indigo-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-indigo-600 uppercase font-black mb-1 truncate">Em Planejamento</p><div id="statPlanejado" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardExecDP" onclick="setListFilter('Em Execução (Dentro do Planejado)')" class="bg-white p-3 rounded-xl border border-green-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-green-600 uppercase font-black mb-1 leading-tight">Execução<br>(Dentro)</p><div id="statExecDP" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardExecEA" onclick="setListFilter('Em Execução (Atenção)')" class="bg-white p-3 rounded-xl border border-yellow-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-yellow-600 uppercase font-black mb-1 leading-tight">Execução<br>(Atenção)</p><div id="statExecEA" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardExecRA" onclick="setListFilter('Em Execução (Em Risco / Atrasado)')" class="bg-white p-3 rounded-xl border border-orange-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-orange-600 uppercase font-black mb-1 leading-tight">Execução<br>(Risco/Atr)</p><div id="statExecRA" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardCritico" onclick="setListFilter('Crítico')" class="bg-white p-3 rounded-xl border border-red-300 shadow-sm stat-card">
+                            <p class="text-[9px] text-red-600 uppercase font-black mb-1">Crítico</p><div id="statCritico" class="text-xl font-black text-slate-800">0</div>
+                        </div>
+                        <div id="cardConcluido" onclick="setListFilter('Concluído')" class="bg-white p-3 rounded-xl border border-emerald-200 shadow-sm stat-card">
+                            <p class="text-[9px] text-emerald-600 uppercase font-black mb-1">Concluído</p><div id="statConcluido" class="text-xl font-black text-slate-800">0</div>
                         </div>
                     </div>
-
-                    <div id="operationalFilters" class="mb-4 hidden">
-                        <select id="filterService" onchange="renderData()" class="input-style"><option value="all">Todos os Serviços</option><option value="SCCE">SCCE</option><option value="SDCG">SDCG</option><option value="SFP">SFP</option><option value="SIEDU">SIEDU</option><option value="SOPED">SOPED</option><option value="SETEF">SETEF</option><option value="SDMP">SDMP</option><option value="SDAP">SDAP</option><option value="SAST">SAST</option><option value="RENAEST">RENAEST</option><option value="SESV">SESV</option><option value="SMO">SMO</option><option value="SEP">SEP</option><option value="STSV">STSV</option><option value="SISV">SISV</option><option value="SIM">SIM</option><option value="SGR">SGR</option><option value="SAT">SAT</option><option value="SENT">SENT</option><option value="SFI">SFI</option></select>
-                    </div>
-
-                    <button id="addBtn" onclick="openNewModal()" class="w-full py-4 border-2 border-dashed border-slate-300 rounded-xl text-slate-400 font-black uppercase hover:border-blue-500 hover:text-blue-500 mb-6 transition-all">Adicionar Novo</button>
-                    <div id="projectsList" class="space-y-4"></div>
-                </div>
-
-                <div id="indicatorsView" class="hidden space-y-8">
-                    <h3 class="font-black text-slate-400 uppercase tracking-widest border-b pb-2">Estratégicos PPA</h3>
-                    <div id="indicatorsList" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
-                    <h3 class="font-black text-slate-400 uppercase tracking-widest border-b pb-2 pt-6">Outros Indicadores</h3>
-                    <div id="otherIndicatorsList" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
-                </div>
-
-                <div id="calendarView" class="hidden space-y-6">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 flex justify-between items-center shadow-sm">
-                        <div class="flex items-center gap-4">
-                            <button onclick="changeMonth(-1)" class="w-8 h-8 rounded-full border hover:bg-slate-100"><i class="fas fa-chevron-left"></i></button>
-                            <div class="text-center"><h2 id="calMonthName" class="text-2xl font-black text-blue-900 capitalize">Mês</h2><p id="calYearName" class="text-sm font-bold text-slate-400">Ano</p></div>
-                            <button onclick="changeMonth(1)" class="w-8 h-8 rounded-full border hover:bg-slate-100"><i class="fas fa-chevron-right"></i></button>
+                    <div id="chartsSection" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm hidden transition-all duration-500 gap-4 chart-legend-container flex-col sm:flex-row w-full xl:w-auto xl:min-w-[320px] xl:max-w-[420px] shrink-0">
+                        <div id="statusChartWrapper" class="flex flex-col items-center gap-3 flex-1 justify-center border-b sm:border-b-0 sm:border-r border-slate-100 pb-3 sm:pb-0 sm:pr-3">
+                             <div class="flex flex-col items-center justify-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Status</p><div id="statusChart" class="chart-pie shadow-inner"></div></div>
+                             <div id="statusLegendContainer" class="grid grid-cols-2 gap-x-2 gap-y-1 justify-center w-full"></div>
                         </div>
-                        <button onclick="openCalendarModal()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-bold uppercase text-xs">Novo Evento</button>
-                    </div>
-                    <div class="overflow-x-auto"><div id="calendarGrid" class="grid grid-cols-7 gap-2 min-w-[800px]"></div></div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200">
-                        <div class="flex justify-between mb-4"><h3 id="eventListTitle" class="font-black text-slate-500 uppercase">Eventos do Mês</h3><button id="clearDayFilterBtn" onclick="filterCalendarByDay(null)" class="hidden text-xs text-blue-600 font-bold">Limpar Filtro</button></div>
-                        <div id="calendarEventsList" class="space-y-2"></div>
+                        <div id="priorityChartWrapper" class="flex flex-col items-center gap-3 flex-1 justify-center sm:pl-3">
+                             <div class="flex flex-col items-center justify-center"><p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Prioridade</p><div id="priorityChart" class="chart-pie shadow-inner"></div></div>
+                             <div class="flex flex-col gap-1 justify-center w-full px-2">
+                                <div onclick="setPriorityFilter('Urgente')" id="legend-prio-urg" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-red-500 shrink-0"></span> <span>Urgente <span id="count-prio-urg" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                                <div onclick="setPriorityFilter('Alta')" id="legend-prio-high" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-orange-500 shrink-0"></span> <span>Alta <span id="count-prio-high" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                                <div onclick="setPriorityFilter('Média')" id="legend-prio-mid" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-yellow-500 shrink-0"></span> <span>Média <span id="count-prio-mid" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                                <div onclick="setPriorityFilter('Baixa')" id="legend-prio-low" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase"><span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span> <span>Baixa <span id="count-prio-low" class="text-slate-400 font-normal ml-0.5"></span></span></div>
+                             </div>
+                        </div>
                     </div>
                 </div>
 
-                <div id="portariaView" class="hidden space-y-6">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-6">
-                        <button onclick="setPortariaFilter('all')" class="portaria-filter-btn filter-all active" id="pf-all">Todos</button>
-                        <button onclick="setPortariaFilter('Diretoria')" class="portaria-filter-btn filter-diretoria" id="pf-Diretoria">Diretoria</button>
-                        <button onclick="setPortariaFilter('Coordenadoria')" class="portaria-filter-btn filter-coordenadoria" id="pf-Coordenadoria">Coordenadorias</button>
-                        <button onclick="setPortariaFilter('Divisão')" class="portaria-filter-btn filter-divisao" id="pf-Divisão">Divisões</button>
-                        <button onclick="setPortariaFilter('Serviço')" class="portaria-filter-btn filter-servico" id="pf-Serviço">Serviços</button>
+                <div id="statsRow2" class="px-4 md:px-6 pt-5 hidden">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm w-full flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+                        <div><p class="text-[10px] text-purple-500 uppercase font-black mb-1 tracking-widest">Total de Recurso Utilizado</p><p class="text-xs text-slate-400">Somatório de todos os contratos e convênios ativos</p></div>
+                        <div id="statResource" class="text-2xl sm:text-3xl font-black text-slate-800"><span class="text-lg sm:text-xl text-slate-400 mr-2 align-middle">R$</span>0,00</div>
                     </div>
-                    <div id="portariaList" class="space-y-4"></div>
+                </div>
+                
+                <div id="operationalFilters" class="px-4 md:px-6 pt-5 flex flex-col sm:flex-row gap-4 hidden">
+                    <div class="flex-1">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-1 block">Filtrar por Serviço</label>
+                        <select id="filterService" onchange="renderData()" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-xs outline-none">
+                            <option value="all">Todos os Serviços</option><option value="SCCE">SCCE</option><option value="SDCG">SDCG</option><option value="SFP">SFP</option><option value="SIEDU">SIEDU</option><option value="SOPED">SOPED</option><option value="SETEF">SETEF</option><option value="SDMP">SDMP</option><option value="SDAP">SDAP</option><option value="SAST">SAST</option><option value="RENAEST">RENAEST</option><option value="SESV">SESV</option><option value="SMO">SMO</option><option value="SEP">SEP</option><option value="STSV">STSV</option><option value="SISV">SISV</option><option value="SIM">SIM</option><option value="SGR">SGR</option><option value="SAT">SAT</option><option value="SENT">SENT</option><option value="SFI">SFI</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="px-4 md:px-6 pt-5">
+                    <button id="addBtn" onclick="openNewModal()" class="action-btn w-full py-3.5 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 transition-all text-xs font-black uppercase tracking-widest hover:border-current btn-theme-project">
+                        <i id="addBtnIcon" class="fas fa-plus-circle mr-2"></i> <span id="addBtnText">Adicionar Projeto</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 px-4 md:px-6 py-6 space-y-4" id="listContainer">
+                    <div id="projectsList" class="space-y-3"></div>
+                </div>
+
+                <div id="legendSection" class="px-6 pb-12 pt-8 mt-10 border-t border-slate-200">
+                    <h4 class="legend-section-title">Glossário de Status</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div class="flex items-start"><span class="legend-badge bg-slate-300 mt-1"></span><div><p class="legend-item-title text-slate-500">Backlog</p><p class="legend-item-desc">Demanda identificada, não iniciada.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-sky-400 mt-1"></span><div><p class="legend-item-title text-sky-600">Iniciado</p><p class="legend-item-desc">Autorizado, sem planejamento.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-indigo-500 mt-1"></span><div><p class="legend-item-title text-indigo-600">Em Planejamento</p><p class="legend-item-desc">Escopo/Cronograma definidos.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-green-500 mt-1"></span><div><p class="legend-item-title text-green-600">Em Execução (OK)</p><p class="legend-item-desc">No prazo, sem desvios.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-amber-400 mt-1"></span><div><p class="legend-item-title text-amber-600">Atenção</p><p class="legend-item-desc">Desvios pontuais.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-orange-500 mt-1"></span><div><p class="legend-item-title text-orange-600">Risco / Atrasado</p><p class="legend-item-desc">Atrasos significativos.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-red-600 mt-1"></span><div><p class="legend-item-title text-red-600">Crítico</p><p class="legend-item-desc">Inviabilidade ou bloqueio.</p></div></div>
+                        <div class="flex items-start"><span class="legend-badge bg-emerald-600 mt-1"></span><div><p class="legend-item-title text-emerald-600">Concluído</p><p class="legend-item-desc">Finalizado e entregue.</p></div></div>
+                    </div>
                 </div>
             </div>
+
+            <!-- NOVA ABA: INDICADORES -->
+            <div id="indicatorsView" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-slate-50 space-y-6 overflow-y-auto pb-20 md:pb-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center shadow-sm"><i class="fas fa-flag-checkered text-xl"></i></div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tight">INDICADORES ESTRATÉGICOS</h3>
+                            <p class="text-xs text-slate-500 font-medium">PPA 2024-2027 | Monitoramento Mensal</p>
+                        </div>
+                    </div>
+                    <div class="bg-pink-50 px-4 py-2 rounded-lg border border-pink-100">
+                        <span class="text-[10px] font-black text-pink-600 uppercase tracking-wider">Exercício 2026</span>
+                    </div>
+                </div>
+                <div id="indicatorsList" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+                
+                <!-- SEÇÃO OUTROS INDICADORES (NOVA) -->
+                <div class="pt-6">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6 flex items-center gap-3">
+                        <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm"><i class="fas fa-chart-bar text-lg"></i></div>
+                        <h3 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tight">Outros Indicadores de Acompanhamento</h3>
+                    </div>
+                    <div id="otherIndicatorsList" class="grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+                </div>
+            </div>
+
+            <!-- Views Ocultas -->
+            <div id="portariaView" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-slate-50 space-y-6 overflow-y-auto pb-20 md:pb-6">
+                <!-- Conteúdo Portaria -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
+                    <div class="flex items-center gap-3">
+                         <div class="w-12 h-12 bg-cyan-100 text-cyan-600 rounded-xl flex items-center justify-center shadow-sm"><i class="fas fa-book-open text-xl"></i></div>
+                         <div><h3 class="text-base sm:text-lg font-black text-slate-800 uppercase tracking-tight">PORTARIA NORMATIVA DETRAN-SP Nº 44/2025</h3><p class="text-xs text-slate-500 font-medium">Regimento Interno e Atribuições</p></div>
+                    </div>
+                    <div class="grid grid-cols-12 gap-2 w-full max-w-xl xl:w-auto xl:min-w-[450px]" id="portariaFilters">
+                        <button onclick="setPortariaFilter('all')" class="portaria-filter-btn col-span-12 filter-all active" id="pf-all">Todos</button>
+                        <button onclick="setPortariaFilter('Diretoria')" class="portaria-filter-btn col-span-4 filter-diretoria" id="pf-Diretoria">Diretoria</button>
+                        <button onclick="setPortariaFilter('Coordenadoria')" class="portaria-filter-btn col-span-8 filter-coordenadoria" id="pf-Coordenadoria">Coordenadorias</button>
+                        <button onclick="setPortariaFilter('Divisão')" class="portaria-filter-btn col-span-6 filter-divisao" id="pf-Divisão">Divisões</button>
+                        <button onclick="setPortariaFilter('Serviço')" class="portaria-filter-btn col-span-6 filter-servico" id="pf-Serviço">Serviços</button>
+                    </div>
+                </div>
+                <div id="portariaList" class="space-y-4"></div>
+            </div>
+
+            <div id="calendarView" class="hidden flex-1 flex flex-col p-4 md:p-6 bg-slate-50 space-y-5 pb-20 md:pb-6">
+                <!-- Conteúdo Calendário -->
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between bg-white p-5 rounded-2xl border border-slate-200 shadow-sm gap-4">
+                     <div class="flex flex-wrap items-center gap-4 pl-2">
+                         <!-- Adicionei classes de cursor e hover para indicar interatividade futura, mas o foco principal é o filtro lateral -->
+                        <div class="flex items-center gap-2 select-none opacity-100"><span class="w-3 h-3 rounded-full bg-blue-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Projetos</span></div>
+                        <div class="flex items-center gap-2 select-none opacity-100"><span class="w-3 h-3 rounded-full bg-purple-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Contratos</span></div>
+                        <div class="flex items-center gap-2 select-none opacity-100"><span class="w-3 h-3 rounded-full bg-orange-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Operacional</span></div>
+                        <div class="flex items-center gap-2 select-none opacity-100"><span class="w-3 h-3 rounded-full bg-green-500"></span><span class="text-[10px] font-black text-slate-500 uppercase">Eventos</span></div>
+                    </div>
+                    <button onclick="openCalendarModal()" class="w-full md:w-auto bg-green-600 text-white px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase hover:bg-green-700 transition-all shadow-lg shadow-green-100 flex items-center justify-center gap-2"><i class="fas fa-plus"></i> Novo Evento</button>
+                </div>
+                <div class="calendar-new-wrapper">
+                    <div class="calendar-new-header">
+                        <div class="flex items-center justify-center gap-4 sm:gap-8 w-full">
+                            <button onclick="changeMonth(-1)" class="w-10 h-10 hover:bg-blue-50 rounded-full flex items-center justify-center border border-slate-200 text-slate-400 hover:text-blue-600 transition-all shadow-sm flex-none"><i class="fas fa-chevron-left text-lg"></i></button>
+                            <div class="text-center min-w-[140px] sm:min-w-[200px]"><h2 id="calMonthName" class="text-2xl sm:text-3xl font-black capitalize tracking-tight leading-none text-blue-900">Mês</h2><p id="calYearName" class="text-blue-600 font-bold text-sm sm:text-base uppercase mt-1">Ano</p></div>
+                            <button onclick="changeMonth(1)" class="w-10 h-10 hover:bg-blue-50 rounded-full flex items-center justify-center border border-slate-200 text-slate-400 hover:text-blue-600 transition-all shadow-sm flex-none"><i class="fas fa-chevron-right text-lg"></i></button>
+                        </div>
+                    </div>
+                    <div class="calendar-new-main">
+                        <div class="min-w-[700px]">
+                            <div class="grid grid-cols-7 gap-2 mb-3">
+                                <div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Dom</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Seg</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Ter</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Qua</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Qui</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Sex</div><div class="text-center text-[10px] font-black text-slate-400 uppercase py-2 bg-slate-50 rounded-lg">Sáb</div>
+                            </div>
+                            <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-5 border-b border-blue-100 pb-3">
+                        <h3 class="text-xs font-black text-blue-900 uppercase tracking-widest" id="eventListTitle">Detalhamento de Eventos</h3>
+                        <button id="clearDayFilterBtn" onclick="filterCalendarByDay(null)" class="hidden text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors">
+                            <i class="fas fa-undo mr-1"></i> Ver Mês Inteiro
+                        </button>
+                    </div>
+                    <div id="calendarEventsList" class="space-y-3"><p class="text-slate-400 text-xs italic text-center py-4">Nenhum evento neste mês.</p></div>
+                </div>
+            </div>
+
+            <!-- Modal Calendário -->
+            <div id="calendarModal" class="items-center justify-center p-2 sm:p-4" style="display: none;">
+                <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200 flex flex-col">
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
+                         <div class="flex items-center gap-3"><div class="w-10 h-10 bg-indigo-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-indigo-100"><i class="fas fa-calendar-plus text-lg"></i></div><h3 class="font-black text-slate-800 uppercase tracking-tight text-base">Evento de Calendário</h3></div>
+                         <button onclick="toggleModal('calendarModal')" class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 hover:text-red-500 transition-all flex items-center justify-center"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="p-6">
+                        <form id="calendarForm" class="space-y-4">
+                            <input type="hidden" id="calEventId">
+                            <div class="flex flex-col"><label class="field-label">Título do Evento</label><input type="text" id="calEventName" class="input-style" required></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="flex flex-col"><label class="field-label">Data</label><input type="date" id="calEventDate" class="input-style" required></div>
+                                <div class="flex flex-col"><label class="field-label">Área</label><select id="calEventArea" class="input-style"></select></div>
+                            </div>
+                            <div class="flex flex-col"><label class="field-label">Observações</label><textarea id="calEventObs" rows="3" class="input-style resize-none"></textarea></div>
+                            <div class="flex gap-3 pt-4">
+                                <button type="button" id="btnDeleteEvent" onclick="deleteCalendarEvent()" class="px-4 py-3 bg-red-50 text-red-600 rounded-xl font-bold text-xs uppercase hover:bg-red-100 hidden"><i class="fas fa-trash"></i></button>
+                                <button type="button" onclick="saveCalendarEvent()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all uppercase text-xs tracking-widest">Salvar Evento</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
@@ -313,139 +643,321 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // --- CONFIGURAÇÃO GLOBAL ---
+        // --- CONFIGURAÇÃO FIREBASE PERSONALIZADA ---
         const firebaseConfig = {
             apiKey: "AIzaSyBVT30qEXkwHw1Le012oKnEJyAUYcwQC8U",
             authDomain: "painel-gestao-d674d.firebaseapp.com",
             projectId: "painel-gestao-d674d",
             storageBucket: "painel-gestao-d674d.firebasestorage.app",
             messagingSenderId: "993067198876",
-            appId: "1:993067198876:web:36e56d669c61437c5ec059"
+            appId: "1:993067198876:web:36e56d669c61437c5ec059",
+            measurementId: "G-ESGFQTL8L5"
         };
         
         const app = initializeApp(firebaseConfig);
-        window.auth = getAuth(app);
-        window.db = getFirestore(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
         
-        // --- DADOS E VARIÁVEIS ---
+        // Caminho fixo para o projeto do usuário
         const appId = 'painel-gestao-main';
+
         let currentUser = null;
         let activeTab = 'projects';
         let currentFilter = 'all';
-        let currentListFilter = 'all';
+        let currentListFilter = 'all'; 
+        let currentPriorityFilter = 'all';
         let currentPortariaFilter = 'all';
         let currentDate = new Date(2026, 0, 1);
-        let selectedCalendarDay = null;
+        let selectedCalendarDay = null; 
 
-        const UNIFIED_STATUS = ["Backlog", "Iniciado", "Em Planejamento", "Em Execução (Dentro do Planejado)", "Em Execução (Atenção)", "Em Execução (Em Risco / Atrasado)", "Crítico", "Concluído"];
-        const STATUS_COLORS_BG = { "Backlog": "bg-slate-300", "Iniciado": "bg-sky-400", "Em Planejamento": "bg-indigo-500", "Em Execução (Dentro do Planejado)": "bg-green-500", "Em Execução (Atenção)": "bg-amber-400", "Em Execução (Em Risco / Atrasado)": "bg-orange-500", "Crítico": "bg-red-600", "Concluído": "bg-emerald-600" };
+        // ... existing constants ...
         const areasList = ["DSV", "EPT", "CEC", "CET", "CGSV", "COST", "CIST", "SCCE", "SDCG", "SFP", "SIEDU", "SOPED", "SETEF", "SDMP", "SDAP", "SAST", "RENAEST", "SESV", "SMO", "SEP", "STSV", "SISV", "SIM", "SGR", "SAT", "SENT", "SFI"];
+        const UNIFIED_STATUS = ["Backlog", "Iniciado", "Em Planejamento", "Em Execução (Dentro do Planejado)", "Em Execução (Atenção)", "Em Execução (Em Risco / Atrasado)", "Crítico", "Concluído"];
+        
+        const STATUS_COLORS_HEX = { "Backlog": "#cbd5e1", "Iniciado": "#38bdf8", "Em Planejamento": "#6366f1", "Em Execução (Dentro do Planejado)": "#22c55e", "Em Execução (Atenção)": "#fbbf24", "Em Execução (Em Risco / Atrasado)": "#f97316", "Crítico": "#dc2626", "Concluído": "#059669" };
+        const STATUS_COLORS_TW_BG = { "Backlog": "bg-slate-300", "Iniciado": "bg-sky-400", "Em Planejamento": "bg-indigo-500", "Em Execução (Dentro do Planejado)": "bg-green-500", "Em Execução (Atenção)": "bg-amber-400", "Em Execução (Em Risco / Atrasado)": "bg-orange-500", "Crítico": "bg-red-600", "Concluído": "bg-emerald-600" };
 
         let dataStore = { projects: [], contracts: [], operational: [], calendarEvents: [], indicators: [] };
 
-        // --- DADOS ESTÁTICOS ---
-        const INITIAL_INDICATORS = [
-            { id: 'ind_5736', code: '5736', product: 'RESPEITO À VIDA', name: 'NÚMERO DE MUNICÍPIOS INTEGRADOS AO SNT', meta: 75, unit: 'un', rule: 'Soma', type: 'ppa', monthly: [0,0,0,0,0,0,0,0,0,0,0,0], ppa: { '2024': 50, '2025': 75, '2026': 75, '2027': 103 }, ppaRealized: { '2025': 0 } },
-            { id: 'ind_5737', code: '5737', product: 'RESPEITO À VIDA', name: 'TAXA DE ÓBITOS POR SINISTROS (/100k hab)', meta: 9.55, unit: '/100k hab', rule: 'Último', type: 'ppa', monthly: [0,0,0,0,0,0,0,0,0,0,0,0], ppa: { '2024': 10.18, '2025': 9.87, '2026': 9.55, '2027': 9.24 }, ppaRealized: { '2025': 0 } },
-            { id: 'ind_5801', code: '5801', product: 'CAPACITAÇÃO', name: 'VAGAS OFERECIDAS (EPT)', meta: 228131, unit: 'un', rule: 'Último', type: 'ppa', monthly: [0,0,0,0,0,0,0,0,0,0,0,0], ppa: { '2024': 172500, '2025': 198375, '2026': 228131, '2027': 330789 }, ppaRealized: { '2025': 0 } },
-            { id: 'ind_5802', code: '5802', product: 'CAPACITAÇÃO', name: 'PERCENTUAL CERTIFICADOS', meta: 90, unit: '%', rule: 'Último', type: 'ppa', monthly: [0,0,0,0,0,0,0,0,0,0,0,0], ppa: { '2024': 86, '2025': 88, '2026': 90, '2027': 92 }, ppaRealized: { '2025': 0 } },
-            { id: 'ind_other_01', code: 'SISTRAN', product: 'OUTROS', name: 'MUNICÍPIOS NO SISTRAN', meta: 0, unit: 'un', rule: 'Soma', type: 'other', monthly: [0,0,0,0,0,0,0,0,0,0,0,0], ppa: { '2026': 0 }, ppaRealized: {} },
-            { id: 'ind_other_03', code: 'INFOSIGA', product: 'DADOS', name: 'ACESSOS INFOSIGA', meta: 0, unit: 'acessos', rule: 'Soma', type: 'other', monthly: [0,0,0,0,0,0,0,0,0,0,0,0], monthly_2025: [0,0,0,0,0,0,0,0,0,0,0,0], ppa: { '2025': 0, '2026': 0 }, ppaRealized: { '2025': 0 } }
-        ];
-
         const PORTARIA_DATA = [
-            { art: 'Art. 256', title: 'Diretoria de Segurança Viária', type: 'Diretoria', items: ['Gestão da Segurança Viária', 'Educação Corporativa', 'Gestão de Convênios'] },
-            { art: 'Art. 257', title: 'Escola Pública de Trânsito', type: 'Coordenadoria', items: ['Educação para o Trânsito', 'Cidadania', 'Campanhas'] },
-            { art: 'Art. 258', title: 'Coord. Educação Corporativa', type: 'Coordenadoria', items: ['Treinamento Interno', 'Gestão do Conhecimento'] },
-            { art: 'Art. 268', title: 'Coord. Geral de Segurança Viária', type: 'Coordenadoria', items: ['Planos de Redução de Mortes', 'Estatísticas'] },
-            { art: 'Art. 270', title: 'Divisão de Estatísticas', type: 'Divisão', items: ['Banco de Dados', 'Análise de Sinistros'] }
-            // (Adicionei alguns principais para resumir, o código aceita mais se quiser)
+            { art: 'Art. 256', title: 'Diretoria de Segurança Viária', type: 'Diretoria', preamble: 'Compete dirigir, planejar, coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Segurança viária e educação para o trânsito', 'Educação corporativa e governança da aprendizagem', 'Aplicação e repasse de valores arrecadados para segurança viária', 'Estatística, estudos, pesquisas e integração de informações para segurança viária', 'Diretrizes para a fiscalização de trânsito e policiamento ostensivo', 'Integração e atuação em rede com os órgãos do Sistema Estadual de Trânsito (SISTRAN)'] },
+            { art: 'Art. 257', title: 'Escola Pública de Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Educação de crianças, adolescentes, jovens e adultos sobre legislação', 'Promoção da Política Nacional de Trânsito (PNT) e cidadania', 'Campanhas de conscientização para o trânsito seguro', 'Ações de educação para condutores profissionais', 'Gestão da educação corporativa, formação e desenvolvimento contínuo'] },
+            { art: 'Art. 258', title: 'Coordenadoria de Educação Corporativa', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Programas de capacitação e desenvolvimento profissional', 'Gestão do conhecimento organizacional', 'Avaliação de desempenho e competências', 'Programas de educação corporativa e gamificação', 'Monitoramento e avaliação de resultados de capacitação', 'Articulação com instituições de ensino e parceiros', 'Gestão das plataformas tecnológicas de ensino', 'Desenvolvimento de lideranças e gestão estratégica'] },
+            { art: 'Art. 259', title: 'Serviço de Desenvolvimento de Competências Específicas', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Mapeamento de competências técnicas', 'Elaboração de programas de treinamento específicos', 'Avaliação de aprendizagem'] },
+            { art: 'Art. 260', title: 'Serviço de Desenvolvimento de Competências Gerais', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de habilidades comportamentais', 'Implementação de programas de liderança', 'Promoção de cultura organizacional'] },
+            { art: 'Art. 261', title: 'Serviço de Formação Profissional', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de programas de formação inicial', 'Gestão de estágios e trainee', 'Implementação de programas de certificação'] },
+            { art: 'Art. 262', title: 'Coordenadoria de Educação para o Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de programas educacionais', 'Articulação com instituições de ensino', 'Promoção da cidadania no trânsito'] },
+            { art: 'Art. 263', title: 'Serviço de Integração da Educação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Articulação com instituições educacionais', 'Desenvolvimento de parcerias educativas', 'Implementação de projetos pedagógicos'] },
+            { art: 'Art. 264', title: 'Serviço de Operações de Educação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Organização de eventos educativos', 'Gestão logística de ações educacionais', 'Implementação de campanhas de trânsito'] },
+            { art: 'Art. 265', title: 'Serviço de Promoção de Educação no Ensino Fundamental', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de material didático', 'Capacitação de educadores', 'Implementação de projetos escolares'] },
+            { art: 'Art. 266', title: 'Serviço de Desenvolvimento de Motoristas Profissionais', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de programas de capacitação para motoristas profissionais', 'Avaliação de competências de condutores', 'Promoção de práticas de direção segura'] },
+            { art: 'Art. 267', title: 'Serviço de Desenvolvimento de Agentes Públicos', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Capacitação de agentes de trânsito', 'Atualização em legislação e procedimentos', 'Desenvolvimento de habilidades de fiscalização'] },
+            { art: 'Art. 268', title: 'Coordenadoria Geral de Segurança Viária', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Implementação e monitoramento dos Planos de Redução de Mortes e Lesões', 'Execução de programas e acordos de cooperação', 'Coleta e gestão de dados estatísticos sobre sinistros', 'Aplicação, transparência e prestação de contas dos investimentos'] },
+            { art: 'Art. 269', title: 'Coordenadoria do Observatório de Segurança no Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração e implantação do Plano Estadual de Segurança Viária', 'Desdobramento do Pnatrans e compartilhamento de dados', 'Análise de dados estatísticos de segurança viária', 'Produção de relatórios estatísticos', 'Desenvolvimento de indicadores de desempenho', 'Estudo de padrões e tendências em sinistros', 'Articulação com órgãos do SNT e instituições acadêmicas', 'Gestão das plataformas tecnológicas e painéis de dados'] },
+            { art: 'Art. 270', title: 'Divisão de Estatísticas de Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de banco de dados de trânsito', 'Análise estatística avançada', 'Elaboração de relatórios técnicos'] },
+            { art: 'Art. 271', title: 'Serviço de Análise de Sinistro de Trânsito', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Investigação de acidentes de trânsito', 'Análise de fatores de risco', 'Elaboração de relatórios técnicos'] },
+            { art: 'Art. 272', title: 'Serviço de Integração da Informação', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de sistemas de informação', 'Integração de bases de dados', 'Desenvolvimento de ferramentas de análise'] },
+            { art: 'Art. 273', title: 'Divisão de Redução de Mortes e Lesões no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento de ações de segurança viária', 'Monitoramento de indicadores de segurança', 'Articulação intersetorial'] },
+            { art: 'Art. 274', title: 'Serviço de Estratégia de Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de estratégias de prevenção', 'Análise de eficácia de intervenções', 'Proposição de medidas de segurança'] },
+            { art: 'Art. 275', title: 'Serviço de Monitoramento', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Acompanhamento de indicadores de segurança', 'Elaboração de relatórios de desempenho', 'Identificação de tendências e padrões'] },
+            { art: 'Art. 276', title: 'Divisão de Estudos para Segurança no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de pesquisas em segurança viária', 'Avaliação de políticas públicas de trânsito', 'Proposição de inovações em segurança'] },
+            { art: 'Art. 277', title: 'Serviço de Estudos e Pesquisas', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Condução de pesquisas em segurança viária', 'Análise de tendências e comportamentos no trânsito', 'Elaboração de relatórios científicos'] },
+            { art: 'Art. 278', title: 'Serviço de Tecnologia em Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Avaliação de novas tecnologias', 'Implementação de soluções inovadoras', 'Monitoramento de tendências tecnológicas'] },
+            { art: 'Art. 279', title: 'Coordenadoria de Integração dos Sistemas de Trânsito', type: 'Coordenadoria', preamble: 'Compete coordenar, controlar, executar e avaliar as atividades referentes a:', items: ['Articulação interinstitucional', 'Gestão de parcerias', 'Coordenação de projetos integrados'] },
+            { art: 'Art. 280', title: 'Divisão de Integração para Segurança no Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Desenvolvimento de projetos interinstitucionais', 'Promoção de eventos de integração', 'Gestão de informações intersetoriais'] },
+            { art: 'Art. 281', title: 'Serviço de Integração para Segurança Viária', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Implementação de ações integradas', 'Articulação com parceiros locais', 'Monitoramento de projetos conjuntos'] },
+            { art: 'Art. 282', title: 'Divisão do Plano Estadual de Segurança Viária', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de planos estratégicos', 'Monitoramento de metas e indicadores', 'Articulação com municípios'] },
+            { art: 'Art. 283', title: 'Serviço de Integração com os Municípios', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Articulação com gestores municipais', 'Apoio técnico a municípios', 'Promoção de ações conjuntas'] },
+            { art: 'Art. 284', title: 'Serviço de Gestão de Recursos', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento orçamentário', 'Gestão financeira de projetos', 'Prestação de contas'] },
+            { art: 'Art. 285', title: 'Serviço de Análise Técnica', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Avaliação técnica de projetos', 'Elaboração de pareceres técnicos', 'Suporte à tomada de decisões'] },
+            { art: 'Art. 286', title: 'Divisão de Engenharia de Trânsito', type: 'Divisão', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Planejamento de infraestrutura viária', 'Análise de projetos de engenharia de tráfego', 'Proposição de melhorias viárias'] },
+            { art: 'Art. 287', title: 'Serviço de Engenharia de Trânsito', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Elaboração de projetos de sinalização', 'Análise de segurança viária', 'Proposição de intervenções físicas'] },
+            { art: 'Art. 288', title: 'Serviço de Fiscalização de Intervenções', type: 'Serviço', preamble: 'Compete controlar, executar e avaliar as atividades referentes a:', items: ['Gestão de contratos e fiscalização de obras', 'Avaliação de conformidade técnica e jurídica', 'Elaboração de relatórios de inspeção'] }
         ];
 
-        // --- FUNÇÕES DE INICIALIZAÇÃO ---
+        const INITIAL_INDICATORS = [
+            // Produto: RESPEITO À VIDA (Estratégico PPA)
+            { 
+                id: 'ind_5736', 
+                code: '5736', 
+                product: 'RESPEITO À VIDA',
+                name: 'NÚMERO DE MUNICÍPIOS INTEGRADOS AO SNT', 
+                meta: 75, 
+                unit: 'un', 
+                rule: 'Soma',
+                type: 'ppa',
+                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
+                ppa: { '2024': 50, '2025': 75, '2026': 75, '2027': 103 },
+                ppaRealized: { '2025': 0 }
+            },
+            { 
+                id: 'ind_5737', 
+                code: '5737', 
+                product: 'RESPEITO À VIDA',
+                name: 'TAXA DE ÓBITOS POR SINISTROS (/100k hab)', 
+                meta: 9.55, 
+                unit: '/100k hab', 
+                rule: 'Último valor',
+                type: 'ppa',
+                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
+                ppa: { '2024': 10.18, '2025': 9.87, '2026': 9.55, '2027': 9.24 },
+                ppaRealized: { '2025': 0 }
+            },
+            // Produto: CAPACITAÇÃO (Estratégico PPA)
+            { 
+                id: 'ind_5801', 
+                code: '5801', 
+                product: 'CAPACITAÇÃO, EDUCAÇÃO E DADOS',
+                name: 'NÚMERO DE VAGAS OFERECIDAS (EPT/CONTRATOS)', 
+                meta: 228131, 
+                unit: 'un', 
+                rule: 'Último valor',
+                type: 'ppa', 
+                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
+                ppa: { '2024': 172500, '2025': 198375, '2026': 228131, '2027': 330789 },
+                ppaRealized: { '2025': 0 }
+            },
+            { 
+                id: 'ind_5802', 
+                code: '5802', 
+                product: 'CAPACITAÇÃO, EDUCAÇÃO E DADOS',
+                name: 'PERCENTUAL DE CERTIFICADOS EMITIDOS', 
+                meta: 90, 
+                unit: '%', 
+                rule: 'Último valor',
+                type: 'ppa',
+                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
+                ppa: { '2024': 86, '2025': 88, '2026': 90, '2027': 92 },
+                ppaRealized: { '2025': 0 }
+            },
+            // OUTROS INDICADORES (Novos)
+            {
+                id: 'ind_other_01',
+                code: 'SISTRAN',
+                product: 'OUTROS INDICADORES',
+                name: 'MUNICÍPIOS INTEGRADOS AO SISTRAN',
+                meta: 0,
+                unit: 'un',
+                rule: 'Soma',
+                type: 'other',
+                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
+                ppa: { '2024': 0, '2025': 0, '2026': 0 }, // Acompanhamento 24/25/26
+                ppaRealized: { '2024': 0, '2025': 0 }
+            },
+            {
+                id: 'ind_other_02',
+                code: 'META BR',
+                product: 'META BR',
+                name: 'META BR - RESPONSABILIDADE DSV',
+                meta: 0,
+                unit: '%',
+                rule: 'Último valor',
+                type: 'other',
+                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
+                ppa: { '2026': 0 },
+                ppaRealized: {}
+            },
+            {
+                id: 'ind_other_03',
+                code: 'INFOSIGA',
+                product: 'GESTÃO DA INFORMAÇÃO',
+                name: 'NÚMERO DE ACESSOS AO INFOSIGA',
+                meta: 0,
+                unit: 'acessos',
+                rule: 'Soma',
+                type: 'other',
+                monthly: [0,0,0,0,0,0,0,0,0,0,0,0],
+                monthly_2025: [0,0,0,0,0,0,0,0,0,0,0,0], // Array para 2025
+                ppa: { '2025': 0, '2026': 0 },
+                ppaRealized: { '2025': 0 }
+            }
+        ];
+
         async function initAuth() {
             try {
-                await signInAnonymously(window.auth);
+                // Tenta autenticação anônima com as credenciais fornecidas
+                await signInAnonymously(auth);
             } catch (error) {
-                console.error("Auth Error:", error);
-                document.getElementById('sysStatusText').innerText = "Erro Auth (Ver Console)";
-                document.getElementById('sysStatusDot').classList.replace('bg-slate-500', 'bg-red-600');
+                console.error("Firebase Auth Error:", error);
+                
+                // Atualiza a UI para mostrar erro específico
+                const statusDiv = document.getElementById('sysStatus');
+                const statusText = document.getElementById('sysStatusText');
+                const statusDot = document.getElementById('sysStatusDot');
+
+                if(statusDiv) {
+                    // Torna o botão clicável e chama atenção
+                    statusDiv.className = "md:mt-5 flex items-center gap-2 text-[10px] font-black uppercase tracking-wider py-1 md:py-2 px-2 md:px-3 rounded-lg w-auto md:w-full transition-all border border-red-900/50 bg-red-50 cursor-pointer animate-pulse";
+                    statusDiv.onclick = () => window.open('https://console.firebase.google.com/project/painel-gestao-d674d/authentication/providers', '_blank');
+                    statusDiv.title = "Clique para ativar a Autenticação Anônima no console";
+                }
+                
+                if(statusDot) {
+                    statusDot.className = "w-2 h-2 rounded-full bg-red-600";
+                }
+
+                if(statusText) {
+                    statusText.className = "text-red-600 hidden sm:inline font-bold";
+                    statusText.innerText = "Erro Auth (Ativar)";
+                }
             }
         }
+        initAuth();
 
         function initListeners() {
             ['projects', 'contracts', 'operational', 'calendar_events', 'indicators'].forEach(colName => {
                 const storeKey = colName === 'calendar_events' ? 'calendarEvents' : colName;
-                onSnapshot(collection(window.db, 'artifacts', appId, 'public', 'data', colName), (snapshot) => {
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', colName), (snapshot) => {
                     let items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    if (colName === 'indicators' && items.length === 0) dataStore[storeKey] = INITIAL_INDICATORS;
-                    else dataStore[storeKey] = items;
                     
-                    document.getElementById('sysStatusText').innerText = snapshot.metadata.hasPendingWrites ? 'Sincronizando...' : 'Online';
-                    document.getElementById('sysStatusDot').className = `w-2 h-2 rounded-full ${snapshot.metadata.hasPendingWrites ? 'bg-amber-400' : 'bg-emerald-400'}`;
-                    renderData();
-                });
+                    if (colName === 'indicators' && items.length === 0) {
+                        dataStore[storeKey] = INITIAL_INDICATORS;
+                    } else {
+                        dataStore[storeKey] = items;
+                    }
+                    
+                    window.updateStatusUI(snapshot.metadata.hasPendingWrites ? 'syncing' : 'online');
+                    window.renderData();
+                }, (err) => console.error("Erro snapshot:", err));
             });
         }
 
-        // --- FUNÇÕES DE UI E LÓGICA ---
-        window.toggleModal = (id) => { const m = document.getElementById(id); m.style.display = (m.style.display === 'flex') ? 'none' : 'flex'; };
-
-        window.switchTab = (tab) => {
-            activeTab = tab; currentListFilter = 'all'; currentFilter = 'all';
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('bg-blue-600', 'text-white', 'bg-purple-600', 'bg-orange-500', 'bg-pink-600', 'bg-indigo-600', 'bg-cyan-600'));
-            const colors = { projects: 'bg-blue-600', contracts: 'bg-purple-600', operational: 'bg-orange-500', indicators: 'bg-pink-600', calendar: 'bg-indigo-600', portaria: 'bg-cyan-600' };
-            document.getElementById(`tab-${tab}`).classList.add(colors[tab], 'text-white');
-            
-            ['standardView', 'indicatorsView', 'calendarView', 'portariaView'].forEach(v => document.getElementById(v).classList.add('hidden'));
-            document.getElementById('operationalFilters').classList.add('hidden');
-            document.getElementById('addBtn').parentElement.classList.add('hidden');
-
-            if (tab === 'indicators') { document.getElementById('indicatorsView').classList.remove('hidden'); renderIndicators(); }
-            else if (tab === 'calendar') { document.getElementById('calendarView').classList.remove('hidden'); renderCalendar(); }
-            else if (tab === 'portaria') { document.getElementById('portariaView').classList.remove('hidden'); renderPortaria(); }
-            else {
-                document.getElementById('standardView').classList.remove('hidden');
-                document.getElementById('addBtn').parentElement.classList.remove('hidden');
-                if (tab === 'operational') document.getElementById('operationalFilters').classList.remove('hidden');
-                renderData();
-            }
-        };
-
-        // --- CRUD PROJETOS/CONTRATOS/OPERACIONAL ---
+        window.toggleModal = id => { const m = document.getElementById(id); m.style.display = (m.style.display === 'flex' || m.style.display === 'block') ? 'none' : 'flex'; };
+        
         window.openNewModal = () => {
-            document.getElementById('projectForm').reset();
+            const form = document.getElementById('projectForm');
+            form.reset();
             document.getElementById('editId').value = '';
             document.getElementById('roadmapContainer').innerHTML = '';
-            document.getElementById('actorsTagContainer').innerHTML = '<input type="text" id="actorInput" class="bg-transparent outline-none flex-1 min-w-[100px]" placeholder="Digite + Enter">';
-            document.getElementById('btnDeleteProject').classList.add('hidden'); // Esconde deletar
+            document.querySelectorAll('.actor-tag').forEach(el => el.remove());
+
+            const typeField = document.getElementById('contractTypeField');
+            const resourceField = document.getElementById('resourceLogicField');
+            const relField = document.getElementById('relationalField');
+            const serviceField = document.getElementById('serviceField');
+            const durationField = document.getElementById('operationalDurationField'); 
             
-            // Configura campos baseados na aba
-            ['contractTypeField', 'contractRelationWrapper', 'resourceLogicField', 'resourceValueField', 'relationalField', 'serviceField', 'operationalDurationField', 'riskField'].forEach(id => document.getElementById(id).classList.add('hidden-field'));
+            typeField.classList.add('hidden-field');
+            resourceField.classList.add('hidden-field');
+            relField.classList.add('hidden-field');
+            serviceField.classList.add('hidden-field');
+            durationField.classList.add('hidden-field'); 
             
+            document.getElementById('projRisks').value = '';
+            document.getElementById('riskField').classList.add('hidden-field');
+            
+            // ESCONDE BOTÃO DELETAR NO MODO CRIAR
+            document.getElementById('deleteBtn').classList.add('hidden');
+
             const statusSelect = document.getElementById('projStatus');
             statusSelect.innerHTML = UNIFIED_STATUS.map(s => `<option value="${s}">${s}</option>`).join('');
 
-            if (activeTab === 'contracts') {
-                ['contractTypeField', 'contractRelationWrapper', 'resourceLogicField'].forEach(id => document.getElementById(id).classList.remove('hidden-field'));
-                document.getElementById('modalTitle').innerText = 'Novo Contrato';
+            if (activeTab === 'projects') {
+                document.getElementById('modalTitle').innerText = 'Novo Projeto Estratégico';
+            } else if (activeTab === 'contracts') {
+                document.getElementById('modalTitle').innerText = 'Novo Contrato / Convênio';
+                typeField.classList.remove('hidden-field');
+                resourceField.classList.remove('hidden-field');
+                document.getElementById('contractRelationWrapper').classList.remove('hidden-field');
             } else if (activeTab === 'operational') {
-                ['relationalField', 'serviceField', 'operationalDurationField'].forEach(id => document.getElementById(id).classList.remove('hidden-field'));
-                document.getElementById('modalTitle').innerText = 'Nova Atividade';
-            } else {
-                document.getElementById('modalTitle').innerText = 'Novo Projeto';
+                document.getElementById('modalTitle').innerText = 'Nova Atividade Operacional';
+                relField.classList.remove('hidden-field');
+                serviceField.classList.remove('hidden-field');
+                durationField.classList.remove('hidden-field'); 
             }
+
             toggleModal('projectModal');
         };
 
+        window.toggleContractRelInput = () => {
+            const isSim = document.querySelector('input[name="contractRelType"]:checked').value === 'sim';
+            const wrapper = document.getElementById('projectSelectWrapper');
+            if (isSim) {
+                wrapper.classList.remove('hidden-field');
+                const select = document.getElementById('projRelation');
+                select.innerHTML = '<option value="">Selecione...</option>' + 
+                                  dataStore.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            } else {
+                wrapper.classList.add('hidden-field');
+            }
+        };
+
+        window.toggleResourceInput = () => {
+            const hasResource = document.getElementById('projHasResource').value === 'Sim';
+            document.getElementById('resourceValueField').classList.toggle('hidden-field', !hasResource);
+        };
+
+        window.toggleOriginInput = () => {
+            const isProject = document.querySelector('input[name="originType"]:checked').value === 'projeto';
+            document.getElementById('projectSelectWrapper').classList.toggle('hidden-field', !isProject);
+        };
+
+        window.toggleRiskInput = () => {
+            const status = document.getElementById('projStatus').value;
+            const riskField = document.getElementById('riskField');
+            const show = ["Em Execução (Atenção)", "Em Execução (Em Risco / Atrasado)", "Crítico"].includes(status);
+            riskField.classList.toggle('hidden-field', !show);
+        };
+
+        window.addRoadmapRow = (data = '', etapa = '') => {
+            const container = document.getElementById('roadmapContainer');
+            const row = document.createElement('div');
+            row.className = 'grid grid-cols-1 sm:grid-cols-12 gap-3 items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm';
+            row.innerHTML = `
+                <div class="sm:col-span-4"><input type="date" class="input-style roadmap-date" value="${data}"></div>
+                <div class="sm:col-span-7"><input type="text" class="input-style roadmap-step" placeholder="Etapa..." value="${etapa}"></div>
+                <div class="sm:col-span-1 text-center"><button type="button" onclick="this.parentElement.parentElement.remove()" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button></div>
+            `;
+            container.appendChild(row);
+        };
+
         window.saveProject = async () => {
-            if (!currentUser) return alert('Aguarde autenticação...');
+            if (!currentUser) return;
             const id = document.getElementById('editId').value || Date.now().toString();
-            
             const roadmap = [];
             document.querySelectorAll('#roadmapContainer > div').forEach(row => {
-                const d = row.querySelector('.rd-date').value;
-                const e = row.querySelector('.rd-step').value;
+                const d = row.querySelector('.roadmap-date').value;
+                const e = row.querySelector('.roadmap-step').value;
                 if (d && e) roadmap.push({ data: d, etapa: e });
             });
 
@@ -463,7 +975,9 @@
                 status: document.getElementById('projStatus').value,
                 priority: document.getElementById('projPriority').value,
                 docLink: document.getElementById('projDocs').value,
-                risks: document.getElementById('projRisks').value,
+                risks: document.getElementById('projRisks').value, 
+                duration: document.getElementById('projDuration').value, 
+                roadmap: roadmap,
                 updatedAt: Date.now()
             };
 
@@ -473,255 +987,743 @@
                 data.resourceValue = document.getElementById('projResourceValue').value;
             } else if (activeTab === 'operational') {
                 data.service = document.getElementById('projService').value;
-                data.duration = document.getElementById('projDuration').value;
             }
 
             try {
-                await setDoc(doc(window.db, 'artifacts', appId, 'public', 'data', activeTab, id), data);
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', activeTab, id), data);
                 toggleModal('projectModal');
-            } catch (err) { console.error(err); alert('Erro ao salvar.'); }
+            } catch (err) {
+                console.error("Erro ao salvar:", err);
+            }
         };
-
+        
+        // --- NOVA FUNÇÃO DE DELETAR ---
         window.deleteProject = async () => {
             const id = document.getElementById('editId').value;
             if (!id) return;
-            if (confirm("Tem certeza que deseja EXCLUIR este registro?")) {
-                try {
-                    await deleteDoc(doc(window.db, 'artifacts', appId, 'public', 'data', activeTab, id));
-                    toggleModal('projectModal');
-                } catch (err) { console.error(err); alert('Erro ao excluir.'); }
+            
+            // Simulação de confirmação no próprio botão (UI Trick)
+            const btn = document.getElementById('deleteBtn');
+            if (btn.innerText.includes('Excluir')) {
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i> Confirmar?';
+                btn.classList.add('bg-red-600', 'text-white');
+                btn.classList.remove('bg-red-50', 'text-red-600');
+                
+                // Reseta botão após 3 segundos
+                setTimeout(() => {
+                    if(document.getElementById('projectModal').style.display !== 'none') {
+                        btn.innerHTML = '<i class="fas fa-trash mr-2"></i> Excluir';
+                        btn.classList.remove('bg-red-600', 'text-white');
+                        btn.classList.add('bg-red-50', 'text-red-600');
+                    }
+                }, 3000);
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', activeTab, id));
+                toggleModal('projectModal');
+            } catch (err) {
+                console.error("Erro ao excluir:", err);
             }
         };
 
-        window.editItem = (id, tab = activeTab) => {
-            const item = dataStore[tab]?.find(i => i.id === id);
+        window.editItem = (id, type) => {
+            const t = type || activeTab;
+            const item = dataStore[t]?.find(i => i.id === id);
             if (!item) return;
+
             window.openNewModal();
-            document.getElementById('btnDeleteProject').classList.remove('hidden'); // Mostra deletar
             document.getElementById('editId').value = item.id;
             
-            // Preenche campos
+            // MOSTRA BOTÃO DELETAR NO MODO EDIÇÃO
+            const delBtn = document.getElementById('deleteBtn');
+            delBtn.classList.remove('hidden');
+            // Reseta estado visual do botão
+            delBtn.innerHTML = '<i class="fas fa-trash mr-2"></i> Excluir';
+            delBtn.classList.remove('bg-red-600', 'text-white');
+            delBtn.classList.add('bg-red-50', 'text-red-600');
+
             document.getElementById('projName').value = item.name || '';
             document.getElementById('projDesc').value = item.desc || '';
             document.getElementById('projObs').value = item.obs || '';
             document.getElementById('projManager').value = item.manager || '';
             document.getElementById('projSei').value = item.sei || '';
             document.getElementById('projPrazo').value = item.prazo || '';
-            document.getElementById('projCoord').value = item.coord || 'EPT';
+            document.getElementById('projCoord').value = item.coord || '';
             document.getElementById('projStatus').value = item.status || 'Backlog';
             document.getElementById('projPriority').value = item.priority || 'Média';
             document.getElementById('projDocs').value = item.docLink || '';
-            document.getElementById('projRisks').value = item.risks || '';
-            
-            if (item.actors) {
+            document.getElementById('projRisks').value = item.risks || ''; 
+            document.getElementById('projDuration').value = item.duration || ''; 
+
+            window.toggleRiskInput(); 
+
+            if (item.actors && Array.isArray(item.actors)) {
                 const container = document.getElementById('actorsTagContainer');
                 const input = document.getElementById('actorInput');
                 item.actors.forEach(act => {
                     const tag = document.createElement('div');
                     tag.className = 'actor-tag';
-                    tag.innerHTML = `<span>${act}</span><i class="fas fa-times cursor-pointer" onclick="this.parentElement.remove()"></i>`;
+                    tag.innerHTML = `<span>${act}</span><i class="fas fa-times cursor-pointer hover:text-blue-800" onclick="this.parentElement.remove()"></i>`;
                     container.insertBefore(tag, input);
                 });
             }
 
-            if (item.roadmap) item.roadmap.forEach(r => addRoadmapRow(r.data, r.etapa));
-            window.toggleRiskInput();
+            if (item.roadmap) {
+                item.roadmap.forEach(r => window.addRoadmapRow(r.data, r.etapa));
+            }
             
-            if (tab === 'contracts') {
+            if (t === 'contracts') {
                 document.getElementById('projType').value = item.type || 'Contrato';
-                if(item.resourceValue) {
-                    document.getElementById('projHasResource').value = 'Sim';
-                    document.getElementById('projResourceValue').value = item.resourceValue;
-                    window.toggleResourceInput();
-                }
-            } else if (tab === 'operational') {
+                document.getElementById('projHasResource').value = item.hasResource || 'Não';
+                document.getElementById('projResourceValue').value = item.resourceValue || '';
+                window.toggleResourceInput();
+            } else if (t === 'operational') {
                 document.getElementById('projService').value = item.service || 'SCCE';
-                document.getElementById('projDuration').value = item.duration || '';
             }
         };
 
-        // --- RENDERIZAÇÃO ---
-        window.renderData = () => {
-            const list = document.getElementById('projectsList');
-            list.innerHTML = '';
-            
-            let data = dataStore[activeTab] || [];
+        window.setPortariaFilter = (type) => {
+            currentPortariaFilter = type;
+            document.querySelectorAll('.portaria-filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('pf-' + type);
+            if(activeBtn) activeBtn.classList.add('active');
+            window.renderPortaria();
+        };
+
+        window.renderPortaria = () => {
+            const container = document.getElementById('portariaList');
             const search = document.getElementById('searchInput').value.toLowerCase();
-            
-            if (search) data = data.filter(i => i.name.toLowerCase().includes(search));
-            if (currentFilter !== 'all') data = data.filter(i => i.coord === currentFilter);
-            if (currentListFilter !== 'all') data = data.filter(i => i.status === currentListFilter);
-            if (activeTab === 'operational' && document.getElementById('filterService').value !== 'all') {
-                data = data.filter(i => i.service === document.getElementById('filterService').value);
+            container.innerHTML = '';
+            let filtered = PORTARIA_DATA.filter(item => 
+                item.title.toLowerCase().includes(search) || 
+                item.items.some(sub => sub.toLowerCase().includes(search)) ||
+                item.art.toLowerCase().includes(search)
+            );
+            if (currentPortariaFilter !== 'all') filtered = filtered.filter(item => item.type === currentPortariaFilter);
+            if(filtered.length === 0) {
+                container.innerHTML = '<p class="text-slate-400 italic text-center mt-10">Nenhum item encontrado.</p>';
+                return;
+            }
+            filtered.forEach(item => {
+                let bc = '', tc = '';
+                if(item.type === 'Diretoria') { bc = 'badge-diretoria'; tc = 'type-diretoria'; }
+                else if(item.type === 'Coordenadoria') { bc = 'badge-coordenadoria'; tc = 'type-coordenadoria'; }
+                else if(item.type === 'Divisão') { bc = 'badge-divisao'; tc = 'type-divisao'; }
+                else { bc = 'badge-servico'; tc = 'type-servico'; }
+                const itemsHtml = item.items.map((sub, idx) => `
+                    <li class="flex items-start gap-3 relative pl-2 group/item">
+                        <span class="text-[10px] font-bold text-slate-400 mt-0.5 w-5 shrink-0 text-right">${['I','II','III','IV','V','VI','VII','VIII','IX','X'][idx] || '-'}</span>
+                        <span class="text-sm text-slate-700 leading-snug border-l border-slate-200 pl-3">${sub}</span>
+                    </li>`).join('');
+                container.innerHTML += `<div class="portaria-card ${tc}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div><span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">${item.art}</span>
+                        <h4 class="font-bold text-slate-800 text-lg leading-tight mb-2">${item.title}</h4>
+                        <p class="text-xs text-slate-500 italic border-l-2 border-slate-200 pl-2 leading-relaxed max-w-2xl">${item.preamble}</p></div>
+                        <span class="portaria-badge ${bc} ml-2 shrink-0">${item.type}</span>
+                    </div><ul class="space-y-3 pt-2">${itemsHtml}</ul></div>`;
+            });
+        };
+
+        window.switchTab = (tab) => {
+            activeTab = tab; currentListFilter = 'all'; currentFilter = 'all'; currentPriorityFilter = 'all';
+            const app = document.getElementById('appShell');
+            const addBtn = document.getElementById('addBtn');
+            const addBtnText = document.getElementById('addBtnText');
+            app.classList.remove('contracts-theme', 'operational-theme', 'portaria-theme');
+            document.querySelectorAll('.tab-btn').forEach(b => b.className = "tab-btn w-auto md:w-full flex items-center space-x-2 md:space-x-3 p-2 md:p-2.5 rounded-lg whitespace-nowrap text-slate-400");
+            const mapBg = { projects: "bg-blue-600", contracts: "bg-purple-600", operational: "bg-orange-500", portaria: "bg-cyan-600", calendar: "bg-indigo-600", indicators: "bg-pink-600" };
+            document.getElementById(`tab-${tab}`).className += " " + mapBg[tab] + " text-white";
+            addBtn.className = "action-btn w-full py-3.5 border-2 border-dashed border-slate-200 rounded-2xl transition-all text-xs font-black uppercase tracking-widest hover:border-current";
+            document.getElementById('standardView').classList.add('hidden');
+            document.getElementById('portariaView').classList.add('hidden');
+            document.getElementById('calendarView').classList.add('hidden');
+            document.getElementById('indicatorsView').classList.add('hidden');
+            document.getElementById('statsWrapper').classList.add('hidden');
+            document.getElementById('addBtn').parentElement.classList.add('hidden');
+
+            if (tab === 'projects') {
+                addBtn.classList.add('btn-theme-project'); addBtnText.innerText = 'Adicionar Projeto';
+                document.getElementById('viewTitle').innerText = 'Portfólio de Projetos';
+                document.getElementById('standardView').classList.remove('hidden');
+                document.getElementById('statsWrapper').classList.remove('hidden');
+                document.getElementById('addBtn').parentElement.classList.remove('hidden');
+                showCharts(true, false);
+            } else if (tab === 'contracts') {
+                addBtn.classList.add('btn-theme-contract'); addBtnText.innerText = 'Adicionar Contrato';
+                app.classList.add('contracts-theme'); document.getElementById('viewTitle').innerText = 'Contratos | Convênios';
+                document.getElementById('standardView').classList.remove('hidden');
+                document.getElementById('statsWrapper').classList.remove('hidden');
+                document.getElementById('addBtn').parentElement.classList.remove('hidden');
+                showCharts(true, false);
+            } else if (tab === 'operational') {
+                addBtn.classList.add('btn-theme-operational'); addBtnText.innerText = 'Adicionar Atividade';
+                app.classList.add('operational-theme'); document.getElementById('viewTitle').innerText = 'Atividades Operacionais';
+                document.getElementById('standardView').classList.remove('hidden');
+                document.getElementById('statsWrapper').classList.remove('hidden');
+                document.getElementById('addBtn').parentElement.classList.remove('hidden');
+                showCharts(false, true);
+            } else if (tab === 'portaria') {
+                app.classList.add('portaria-theme'); document.getElementById('viewTitle').innerText = 'Portaria Detran nº 44/2025';
+                document.getElementById('portariaView').classList.remove('hidden');
+                window.renderPortaria();
+            } else if (tab === 'calendar') {
+                document.getElementById('viewTitle').innerText = 'Calendário Estratégico';
+                document.getElementById('calendarView').classList.remove('hidden');
+                window.renderCalendar();
+            } else if (tab === 'indicators') {
+                document.getElementById('viewTitle').innerText = 'Indicadores Estratégicos';
+                document.getElementById('indicatorsView').classList.remove('hidden');
+                window.renderIndicators();
             }
 
-            // Atualiza Cards
-            const counts = {}; UNIFIED_STATUS.forEach(s => counts[s] = 0);
-            data.forEach(i => counts[i.status] = (counts[i.status] || 0) + 1);
-            document.getElementById('statTotal').innerText = data.length;
-            ['Backlog','Iniciado','Crítico','Concluído'].forEach(s => document.getElementById('stat'+s).innerText = counts[s]);
-            document.getElementById('statPlanejado').innerText = counts['Em Planejamento'];
-            document.getElementById('statExecDP').innerText = counts['Em Execução (Dentro do Planejado)'];
-            document.getElementById('statExecEA').innerText = counts['Em Execução (Atenção)'];
+            document.getElementById('filterService').value = 'all';
+            document.getElementById('operationalFilters').style.display = tab === 'operational' ? 'flex' : 'none';
+            document.getElementById('statsRow2').style.display = tab === 'contracts' ? 'block' : 'none';
+            document.querySelectorAll('.active-coord').forEach(b => b.classList.remove('active-coord'));
+            document.querySelectorAll('.active-filter').forEach(c => c.classList.remove('active-filter'));
+            document.getElementById('cardTotal')?.classList.add('active-filter');
+            
+            document.querySelectorAll('[id^="legend-prio-"]').forEach(el => el.classList.remove('active-legend'));
+            
+            if(tab !== 'portaria' && tab !== 'calendar' && tab !== 'indicators') window.renderData();
+        };
 
-            data.forEach(item => {
-                const color = STATUS_COLORS_BG[item.status] || 'bg-slate-200';
-                const div = document.createElement('div');
-                div.className = 'accordion-row bg-white border border-slate-200 rounded-xl overflow-hidden';
-                div.innerHTML = `
-                    <div class="p-4 flex flex-col sm:flex-row gap-4 items-center cursor-pointer" onclick="this.parentElement.classList.toggle('active')">
-                        <div class="w-2 h-10 rounded-full ${color}"></div>
-                        <div class="flex-1">
-                            <h4 class="font-bold text-slate-800">${item.name}</h4>
-                            <div class="flex gap-2 text-[10px] font-bold uppercase text-slate-400 mt-1">
-                                <span>${item.coord}</span> <span>•</span> <span>${item.status}</span>
+        window.renderIndicators = () => {
+            const listPPA = document.getElementById('indicatorsList');
+            const listOther = document.getElementById('otherIndicatorsList');
+            
+            const data = dataStore.indicators.length > 0 ? dataStore.indicators : INITIAL_INDICATORS;
+            
+            listPPA.innerHTML = '';
+            listOther.innerHTML = '';
+
+            data.forEach(ind => {
+                let total = 0;
+                if (ind.rule === 'Soma') {
+                    total = ind.monthly.reduce((a, b) => a + Number(b), 0);
+                } else {
+                    const filled = ind.monthly.filter(v => Number(v) !== 0);
+                    total = filled.length > 0 ? filled[filled.length - 1] : 0;
+                }
+                
+                const formattedTotal = total.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+                const formattedMeta = ind.meta.toLocaleString('pt-BR', { maximumFractionDigits: 2 });
+                const percent = ind.meta > 0 ? Math.round((total / ind.meta) * 100) : 0;
+                
+                const monthsHtml = ind.monthly.map((v, i) => {
+                    const mName = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'][i];
+                    return `<div class="month-cell"><div class="month-label">${mName}</div><div class="month-value">${Number(v).toLocaleString('pt-BR')}</div></div>`;
+                }).join('');
+
+                let ppaHtml = '';
+                if(ind.ppa && Object.keys(ind.ppa).length > 0) {
+                    const years = Object.keys(ind.ppa).sort();
+                    ppaHtml = `<div class="mt-5 pt-4 border-t border-slate-100">
+                        <p class="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest">Evolução Anual</p>
+                        <div class="grid grid-cols-4 gap-2">
+                            ${years.map(year => {
+                                const isCurrent = year === '2026';
+                                const metaVal = ind.ppa[year];
+                                const realVal = (ind.ppaRealized && ind.ppaRealized[year]) ? ind.ppaRealized[year] : null;
+                                let displayVal = metaVal.toLocaleString('pt-BR');
+                                
+                                if(realVal !== null && year !== '2026') {
+                                     displayVal = `<span class="text-[9px] text-slate-400 block">Meta: ${metaVal}</span><span class="text-pink-600 font-black">${realVal}</span>`;
+                                } else if (year === '2025') {
+                                     displayVal = `<span class="text-[9px] text-slate-400 block">Meta</span><span class="text-slate-600 font-bold">${metaVal}</span>`;
+                                }
+
+                                return `<div class="ppa-year-box ${isCurrent ? 'current' : ''}">
+                                    <div class="ppa-year-label">${year}</div>
+                                    <div class="ppa-year-value">${displayVal}</div>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                }
+
+                const cardHtml = `
+                    <div class="indicator-card" onclick="openIndicatorModal('${ind.id}')">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-[10px] font-black ${ind.type === 'ppa' ? 'text-pink-500' : 'text-indigo-500'} uppercase tracking-widest block mb-1">Produto ${ind.code} <span class="text-slate-400">|</span> ${ind.product}</span>
+                                <h4 class="font-bold text-slate-800 text-base leading-tight">${ind.name}</h4>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-black text-slate-400 uppercase">${ind.rule === 'Soma' ? 'Acumulado' : 'Último'}</span>
+                                <p class="text-xl font-black ${ind.type === 'ppa' ? 'text-pink-700' : 'text-indigo-700'} leading-none">${formattedTotal} <span class="text-xs text-slate-400">${ind.unit}</span></p>
                             </div>
                         </div>
-                        <button onclick="event.stopPropagation(); editItem('${item.id}')" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-blue-600"><i class="fas fa-edit"></i></button>
-                    </div>
-                    <div class="accordion-content bg-slate-50 px-6">
-                        <div class="py-4 space-y-2 text-sm text-slate-600">
-                            <p><strong>Descrição:</strong> ${item.desc || '-'}</p>
-                            <p><strong>Gestor:</strong> ${item.manager || '-'}</p>
-                            <p><strong>Prazo:</strong> ${item.prazo ? new Date(item.prazo+"T00:00:00").toLocaleDateString('pt-BR') : '-'}</p>
-                            ${item.risks ? `<p class="text-red-600 font-bold bg-red-50 p-2 rounded">⚠️ ${item.risks}</p>` : ''}
+                        
+                        <div class="mb-5">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-500 uppercase mb-1">
+                                <span>Progresso da Meta (2026)</span>
+                                <span>${percent}% de ${formattedMeta} ${ind.unit}</span>
+                            </div>
+                            <div class="progress-bg"><div class="progress-fill" style="width: ${Math.min(percent, 100)}%; background-color: ${ind.type === 'ppa' ? '#db2777' : '#4f46e5'};"></div></div>
                         </div>
+
+                        <div class="grid grid-cols-6 gap-2">
+                            ${monthsHtml}
+                        </div>
+                        
+                        ${ppaHtml}
                     </div>
                 `;
-                list.appendChild(div);
+
+                if(ind.type === 'ppa') listPPA.innerHTML += cardHtml;
+                else listOther.innerHTML += cardHtml;
             });
         };
 
-        // --- UTILITÁRIOS E OUTRAS ABAS (Resumido para caber, mas funcional) ---
-        window.addRoadmapRow = (d='', e='') => {
-            const row = document.createElement('div');
-            row.className = 'flex gap-2';
-            row.innerHTML = `<input type="date" class="rd-date input-style w-1/3" value="${d}"><input type="text" class="rd-step input-style flex-1" value="${e}" placeholder="Etapa"><button type="button" onclick="this.parentElement.remove()" class="text-red-400"><i class="fas fa-trash"></i></button>`;
-            document.getElementById('roadmapContainer').appendChild(row);
-        };
-        
-        window.toggleContractRelInput = () => document.getElementById('projectSelectWrapper').classList.toggle('hidden-field', !document.querySelector('input[name="contractRelType"][value="sim"]').checked);
-        window.toggleResourceInput = () => document.getElementById('resourceValueField').classList.toggle('hidden-field', document.getElementById('projHasResource').value !== 'Sim');
-        window.toggleOriginInput = () => document.getElementById('projectSelectWrapper').classList.toggle('hidden-field', !document.querySelector('input[name="originType"][value="projeto"]').checked);
-        window.toggleRiskInput = () => document.getElementById('riskField').classList.toggle('hidden-field', !["Em Execução (Atenção)", "Em Execução (Em Risco / Atrasado)", "Crítico"].includes(document.getElementById('projStatus').value));
-        window.setListFilter = (f) => { currentListFilter = f; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-filter')); renderData(); };
-        window.setFilter = (f) => { currentFilter = f; renderData(); };
-        
-        // --- PORTARIA ---
-        window.setPortariaFilter = (f) => { currentPortariaFilter = f; document.querySelectorAll('.portaria-filter-btn').forEach(b => b.classList.remove('active')); document.getElementById('pf-'+f)?.classList.add('active'); renderPortaria(); };
-        window.renderPortaria = () => {
-            const c = document.getElementById('portariaList'); c.innerHTML = '';
-            let d = PORTARIA_DATA.filter(i => currentPortariaFilter === 'all' || i.type === currentPortariaFilter);
-            d.forEach(i => c.innerHTML += `<div class="portaria-card type-${i.type.toLowerCase()}"><div class="flex justify-between mb-2"><span class="text-xs font-black text-slate-400">${i.art}</span><span class="portaria-badge badge-${i.type.toLowerCase()}">${i.type}</span></div><h4 class="font-bold mb-2">${i.title}</h4><ul class="list-disc pl-4 text-xs text-slate-600">${i.items.map(x => `<li>${x}</li>`).join('')}</ul></div>`);
-        };
-
-        // --- CALENDÁRIO (Simplificado) ---
-        window.changeMonth = (o) => { currentDate.setMonth(currentDate.getMonth() + o); renderCalendar(); };
-        window.filterCalendarByDay = (d) => { selectedCalendarDay = d; renderCalendar(); };
-        window.renderCalendar = () => {
-            const grid = document.getElementById('calendarGrid'); grid.innerHTML = '';
-            const list = document.getElementById('calendarEventsList'); list.innerHTML = '';
-            const y = currentDate.getFullYear(), m = currentDate.getMonth();
-            const mn = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-            document.getElementById('calMonthName').innerText = mn[m]; document.getElementById('calYearName').innerText = y;
-            
-            const firstDay = new Date(y, m, 1).getDay();
-            const daysInMonth = new Date(y, m + 1, 0).getDate();
-            
-            for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
-            
-            let monthEvents = [];
-            ['projects', 'contracts', 'operational', 'calendarEvents'].forEach(k => {
-                (dataStore[k] || []).forEach(e => {
-                    if (e.prazo) {
-                        const [ey, em, ed] = e.prazo.split('-');
-                        if(parseInt(ey) === y && parseInt(em) === m+1) monthEvents.push({...e, day: parseInt(ed), type: k});
-                    }
-                });
-            });
-
-            for(let d=1; d<=daysInMonth; d++) {
-                const cell = document.createElement('div');
-                cell.className = 'calendar-new-day-cell';
-                const dayEvts = monthEvents.filter(e => e.day === d);
-                cell.innerHTML = `<span class="text-[10px] font-bold text-slate-400 block text-right">${d}</span>`;
-                if(dayEvts.length > 0) cell.innerHTML += `<span class="block bg-blue-100 text-blue-600 text-[9px] font-bold px-1 rounded text-center cursor-pointer" onclick="filterCalendarByDay('${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}')">${dayEvts.length} eventos</span>`;
-                grid.appendChild(cell);
-            }
-            
-            const displayEvts = selectedCalendarDay ? monthEvents.filter(e => e.prazo === selectedCalendarDay) : monthEvents;
-            document.getElementById('clearDayFilterBtn').classList.toggle('hidden', !selectedCalendarDay);
-            displayEvts.forEach(e => list.innerHTML += `<div class="p-2 border rounded text-xs flex justify-between"><span>${e.name}</span><span class="font-bold text-slate-400">${e.prazo}</span></div>`);
-        };
-        
-        window.openCalendarModal = () => { document.getElementById('calendarForm').reset(); document.getElementById('calEventId').value = ''; toggleModal('calendarModal'); };
-        window.saveCalendarEvent = async () => {
-            const id = document.getElementById('calEventId').value || Date.now().toString();
-            await setDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'calendarEvents', id), {
-                name: document.getElementById('calEventName').value,
-                prazo: document.getElementById('calEventDate').value,
-                area: document.getElementById('calEventArea').value,
-                obs: document.getElementById('calEventObs').value
-            });
-            toggleModal('calendarModal');
-        };
-
-        // --- INDICADORES (Simplificado) ---
-        window.renderIndicators = () => {
-            const c1 = document.getElementById('indicatorsList'); c1.innerHTML = '';
-            const c2 = document.getElementById('otherIndicatorsList'); c2.innerHTML = '';
-            const data = dataStore.indicators.length ? dataStore.indicators : INITIAL_INDICATORS;
-            
-            data.forEach(ind => {
-                const total = ind.rule === 'Soma' ? ind.monthly.reduce((a,b)=>a+Number(b),0) : Number(ind.monthly.filter(x=>x>0).pop()||0);
-                const pct = ind.meta > 0 ? Math.round((total/ind.meta)*100) : 0;
-                const html = `
-                    <div class="indicator-card" onclick="openIndicatorModal('${ind.id}')">
-                        <div class="flex justify-between mb-2"><div><span class="text-[10px] font-black uppercase text-pink-500">${ind.code}</span><h4 class="font-bold">${ind.name}</h4></div><span class="text-xl font-black text-pink-700">${total}</span></div>
-                        <div class="progress-bg"><div class="progress-fill" style="width: ${Math.min(pct,100)}%"></div></div>
-                        <div class="grid grid-cols-6 gap-1 mt-2">${ind.monthly.map((v,i) => `<div class="month-cell"><div class="month-label">${i+1}</div><div class="month-value">${v}</div></div>`).join('')}</div>
-                    </div>`;
-                if(ind.type === 'ppa') c1.innerHTML += html; else c2.innerHTML += html;
-            });
-        };
-        
         window.openIndicatorModal = (id) => {
-            const ind = (dataStore.indicators.length ? dataStore.indicators : INITIAL_INDICATORS).find(i => i.id === id);
+            const data = dataStore.indicators.length > 0 ? dataStore.indicators : INITIAL_INDICATORS;
+            const ind = data.find(i => i.id === id);
+            if(!ind) return;
+
             document.getElementById('indId').value = ind.id;
             document.getElementById('indNameDisplay').innerText = ind.name;
-            document.getElementById('indMetaDisplay').innerText = ind.meta;
-            document.getElementById('indMonthsGrid').innerHTML = ind.monthly.map((v,i) => `<div><label class="text-[9px] uppercase font-bold text-slate-400">${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][i]}</label><input type="number" id="indM_${i}" value="${v}" class="input-style text-center"></div>`).join('');
+            document.getElementById('indMetaDisplay').innerText = `${ind.meta.toLocaleString('pt-BR')} ${ind.unit}`;
+            
+            const grid = document.getElementById('indMonthsGrid');
+            grid.innerHTML = ind.monthly.map((v, i) => {
+                const mName = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][i];
+                return `
+                    <div class="flex flex-col">
+                        <label class="field-label text-center">${mName}</label>
+                        <input type="number" step="0.01" class="input-style text-center font-bold text-pink-700" value="${v}" id="indMonth_${i}">
+                    </div>
+                `;
+            }).join('');
+
+            const wrapper2025 = document.getElementById('indMonths2025Wrapper');
+            const grid2025 = document.getElementById('indMonthsGrid2025');
+            
+            if (ind.monthly_2025) {
+                wrapper2025.classList.remove('hidden');
+                grid2025.innerHTML = ind.monthly_2025.map((v, i) => {
+                    const mName = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'][i];
+                    return `
+                        <div class="flex flex-col">
+                            <label class="field-label text-center text-indigo-400">${mName}</label>
+                            <input type="number" step="0.01" class="input-style text-center font-bold text-indigo-700 border-indigo-200 focus:ring-indigo-200" value="${v}" id="indMonth2025_${i}">
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                wrapper2025.classList.add('hidden');
+                grid2025.innerHTML = '';
+            }
+
+            const ppaSection = document.getElementById('indPpaSection');
+            const ppaGrid = document.getElementById('indPpaGrid');
+            const ppaTitle = ppaSection.querySelector('h5'); 
+            
+            if(ind.ppa && Object.keys(ind.ppa).length > 0) {
+                ppaSection.classList.remove('hidden');
+                
+                if (ind.type === 'ppa') {
+                    ppaTitle.innerText = 'Histórico PPA (2024-2027)';
+                } else {
+                    ppaTitle.innerText = 'Histórico / Dados Anteriores';
+                }
+
+                ppaGrid.innerHTML = Object.keys(ind.ppa).sort().map(year => {
+                    const metaVal = ind.ppa[year];
+                    const realVal = (ind.ppaRealized && ind.ppaRealized[year]) ? ind.ppaRealized[year] : '';
+                    
+                    let content = '';
+                    
+                    if(year === '2024') {
+                         content = `<div class="bg-slate-100 p-3 rounded-lg opacity-60"><span class="block text-[10px] font-black text-slate-400 uppercase">${year}</span><span class="font-bold text-slate-600">Meta: ${metaVal}</span></div>`;
+                    } else if (year === '2027') {
+                         content = `<div class="bg-slate-100 p-3 rounded-lg opacity-60"><span class="block text-[10px] font-black text-slate-400 uppercase">${year}</span><span class="font-bold text-slate-600">Meta: ${metaVal}</span></div>`;
+                    } else if (year === '2025') {
+                         if (ind.monthly_2025) {
+                             const sum2025 = ind.monthly_2025.reduce((a, b) => a + Number(b), 0);
+                             content = `<div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                                <span class="block text-[10px] font-black text-indigo-600 uppercase mb-2">${year} - Meta: ${metaVal}</span>
+                                <div class="flex flex-col gap-1">
+                                    <label class="text-[9px] font-bold text-indigo-300 uppercase">Total (Soma Mensal)</label>
+                                    <div class="text-lg font-black text-indigo-700">${sum2025.toLocaleString('pt-BR')}</div>
+                                    <input type="hidden" id="indPpaReal_2025" value="${sum2025}">
+                                </div>
+                             </div>`;
+                         } else {
+                             content = `<div class="bg-white p-3 rounded-lg border border-pink-200">
+                                <span class="block text-[10px] font-black text-pink-600 uppercase mb-2">${year} - Meta: ${metaVal}</span>
+                                <div class="flex flex-col gap-1">
+                                    <label class="text-[9px] font-bold text-slate-400 uppercase">Alcançado</label>
+                                    <input type="number" step="0.01" id="indPpaReal_2025" value="${realVal}" class="input-style !py-1 !text-xs font-black text-slate-700 border-pink-200" placeholder="0">
+                                </div>
+                             </div>`;
+                         }
+                    } else if (year === '2026') {
+                         content = `<div class="bg-pink-50 p-3 rounded-lg border border-pink-100"><span class="block text-[10px] font-black text-pink-600 uppercase">${year}</span><span class="text-xs font-bold text-slate-500 italic">Preenchimento mensal abaixo</span></div>`;
+                    }
+                    
+                    return content;
+                }).join('');
+            } else {
+                ppaSection.classList.add('hidden');
+            }
+
             toggleModal('indicatorModal');
         };
 
         window.saveIndicator = async () => {
             const id = document.getElementById('indId').value;
-            let data = dataStore.indicators.length ? [...dataStore.indicators] : [...INITIAL_INDICATORS];
-            const idx = data.findIndex(i => i.id === id);
-            if(idx >= 0) {
-                for(let i=0; i<12; i++) data[idx].monthly[i] = Number(document.getElementById(`indM_${i}`).value);
-                await setDoc(doc(window.db, 'artifacts', appId, 'public', 'data', 'indicators', id), data[idx]);
-                toggleModal('indicatorModal');
+            let currentData = dataStore.indicators.length > 0 ? [...dataStore.indicators] : [...INITIAL_INDICATORS];
+            const idx = currentData.findIndex(i => i.id === id);
+            
+            if (idx >= 0) {
+                const newMonthly = [];
+                for(let i=0; i<12; i++) {
+                    newMonthly.push(Number(document.getElementById(`indMonth_${i}`).value) || 0);
+                }
+                currentData[idx].monthly = newMonthly;
+
+                if (currentData[idx].monthly_2025) {
+                    const newMonthly2025 = [];
+                    for(let i=0; i<12; i++) {
+                        newMonthly2025.push(Number(document.getElementById(`indMonth2025_${i}`).value) || 0);
+                    }
+                    currentData[idx].monthly_2025 = newMonthly2025;
+                    
+                    if (currentData[idx].rule === 'Soma') {
+                        const sum2025 = newMonthly2025.reduce((a, b) => a + b, 0);
+                        if(!currentData[idx].ppaRealized) currentData[idx].ppaRealized = {};
+                        currentData[idx].ppaRealized['2025'] = sum2025;
+                    }
+                } else {
+                    const ppa2025Input = document.getElementById('indPpaReal_2025');
+                    if(ppa2025Input) {
+                        if(!currentData[idx].ppaRealized) currentData[idx].ppaRealized = {};
+                        currentData[idx].ppaRealized['2025'] = Number(ppa2025Input.value) || 0;
+                    }
+                }
+                
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'indicators', id), currentData[idx]);
+                    toggleModal('indicatorModal');
+                } catch(err) {
+                    console.error("Erro ao salvar indicador", err);
+                }
             }
         };
 
-        // --- AUTH OBSERVER ---
-        onAuthStateChanged(window.auth, (user) => {
+        function showCharts(showCards, showStatusChart) {
+            const statsRow1 = document.getElementById('statsRow1');
+            const chartsSection = document.getElementById('chartsSection');
+            const statusChartWrapper = document.getElementById('statusChartWrapper');
+            const priorityChartWrapper = document.getElementById('priorityChartWrapper');
+            
+            const statusLegend = document.getElementById('statusLegendContainer');
+            
+            if(showCards) {
+                statsRow1.classList.remove('hidden'); chartsSection.classList.remove('hidden');
+                chartsSection.className = "bg-white p-4 rounded-2xl border border-slate-200 shadow-sm transition-all duration-500 gap-4 chart-legend-container flex-col sm:flex-row w-full xl:w-auto xl:min-w-[320px] xl:max-w-[420px] shrink-0 flex";
+                statusChartWrapper.classList.add('hidden'); priorityChartWrapper.classList.remove('hidden', 'sm:pl-3');
+                
+                statusLegend.className = "grid grid-cols-2 gap-x-2 gap-y-1 justify-center w-full"; 
+            } else {
+                statsRow1.classList.add('hidden'); chartsSection.classList.remove('hidden');
+                chartsSection.className = "flex w-full bg-white p-4 rounded-2xl border border-slate-200 shadow-sm gap-4 chart-legend-container flex-col sm:flex-row";
+                statusChartWrapper.classList.remove('hidden'); priorityChartWrapper.classList.remove('hidden'); priorityChartWrapper.classList.add('sm:pl-3');
+                
+                statusLegend.className = "flex flex-wrap justify-center gap-3 w-full mt-2";
+            }
+        }
+
+        window.renderData = () => {
+            if (activeTab === 'calendar') { window.renderCalendar(); return; }
+            if (activeTab === 'portaria') { window.renderPortaria(); return; }
+            if (activeTab === 'indicators') { window.renderIndicators(); return; }
+            const container = document.getElementById('projectsList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            container.innerHTML = '';
+            let filtered = dataStore[activeTab] || [];
+            if(search) filtered = filtered.filter(i => i.name && i.name.toLowerCase().includes(search));
+            if(currentFilter !== 'all') filtered = filtered.filter(i => i.coord === currentFilter);
+            if(activeTab === 'operational' && document.getElementById('filterService').value !== 'all') filtered = filtered.filter(i => i.service === document.getElementById('filterService').value);
+            
+            if(currentPriorityFilter !== 'all') filtered = filtered.filter(i => i.priority === currentPriorityFilter);
+            
+            const counts = {}; UNIFIED_STATUS.forEach(s => counts[s] = 0);
+            filtered.forEach(item => { if(counts[item.status] !== undefined) counts[item.status]++; });
+            document.getElementById('statTotal').innerText = filtered.length;
+            const map = {'Backlog':'statBacklog','Iniciado':'statIniciado','Em Planejamento':'statPlanejado','Crítico':'statCritico','Concluído':'statConcluido'};
+            Object.keys(map).forEach(k => { if(document.getElementById(map[k])) document.getElementById(map[k]).innerText = counts[k]; });
+            document.getElementById('statExecDP').innerText = counts['Em Execução (Dentro do Planejado)'];
+            document.getElementById('statExecEA').innerText = counts['Em Execução (Atenção)'];
+            document.getElementById('statExecRA').innerText = counts['Em Execução (Em Risco / Atrasado)'];
+            if (activeTab === 'contracts') {
+                let totalResource = 0;
+                filtered.forEach(item => { if (item.resourceValue) { const cleanVal = item.resourceValue.toString().replace(/[R$\s.]/g, '').replace(',', '.'); const val = parseFloat(cleanVal); if (!isNaN(val)) totalResource += val; }});
+                document.getElementById('statResource').innerHTML = `<span class="text-xl text-slate-400 mr-2 align-middle">R$</span>${totalResource.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+            }
+            if(currentListFilter !== 'all') filtered = filtered.filter(i => i.status === currentListFilter);
+            const total = filtered.length || 1;
+            if (!document.getElementById('statusChartWrapper').classList.contains('hidden')) {
+                let ca = 0, gs = 'conic-gradient(', lh = '';
+                UNIFIED_STATUS.forEach((st) => {
+                    const c = counts[st], p = (c / total) * 100, color = STATUS_COLORS_HEX[st];
+                    if (c > 0) { gs += `${color} ${ca}% ${ca + p}%, `; ca += p; }
+                    lh += `<div onclick="setListFilter('${st}')" class="chart-legend-item flex items-center gap-2 text-[9px] font-bold text-slate-600 uppercase cursor-pointer mb-1 ${currentListFilter === st ? 'active-legend' : ''}"><span class="w-2 h-2 rounded-full ${STATUS_COLORS_TW_BG[st]} shrink-0"></span> <span class="truncate">${st.replace('Em Execução ', '')} (${c})</span></div>`;
+                });
+                document.getElementById('statusChart').style.background = (total === 0 || filtered.length === 0) ? '#e2e8f0' : gs.slice(0, -2) + ')';
+                document.getElementById('statusLegendContainer').innerHTML = lh;
+            }
+            if (!document.getElementById('priorityChartWrapper').classList.contains('hidden')) {
+                const urg = filtered.filter(p => p.priority === 'Urgente').length, high = filtered.filter(p => p.priority === 'Alta').length, mid = filtered.filter(p => p.priority === 'Média').length;
+                const pU = Math.round((urg/total)*100), pH = Math.round((high/total)*100), pM = Math.round((mid/total)*100);
+                document.getElementById('priorityChart').style.background = `conic-gradient(#ef4444 0% ${pU}%, #f97316 ${pU}% ${pU+pH}%, #eab308 ${pU+pH}% ${pU+pH+pM}%, #22c55e ${pU+pH+pM}% 100%)`;
+                document.getElementById('count-prio-urg').innerText = `(${urg})`; document.getElementById('count-prio-high').innerText = `(${high})`; document.getElementById('count-prio-mid').innerText = `(${mid})`; document.getElementById('count-prio-low').innerText = `(${filtered.filter(p => p.priority === 'Baixa').length})`;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            filtered.forEach(item => {
+                const sortedRoadmap = (item.roadmap || []).sort((a,b) => a.data.localeCompare(b.data));
+                
+                const roadmapHtml = sortedRoadmap.length > 0 ? `<div class="mt-4 pt-4 border-t border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-3">Roadmap</p><div class="space-y-2 relative before:absolute before:left-[5px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">` + sortedRoadmap.map(r => {
+                    const isPast = r.data < today;
+                    const dotClass = isPast ? 'bg-slate-300' : 'bg-blue-500 ring-4 ring-blue-100';
+                    const dateClass = isPast ? 'text-slate-400' : 'text-blue-600 font-black';
+                    const textClass = isPast ? 'text-slate-400 line-through decoration-slate-300' : 'text-slate-700 font-bold';
+                    
+                    return `<div class="flex items-start gap-4 relative z-10 pl-1"><div class="w-2.5 h-2.5 rounded-full ${dotClass} mt-1.5 shrink-0"></div><div class="flex-1"><p class="text-[10px] ${dateClass}">${new Date(r.data + "T00:00:00").toLocaleDateString('pt-BR')}</p><p class="text-xs ${textClass}">${r.etapa}</p></div></div>`;
+                }).join('') + `</div></div>` : `<div class="mt-4 pt-4 border-t border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Roadmap</p><p class="text-xs text-slate-400 italic">Nenhum marco.</p></div>`;
+                
+                const row = document.createElement('div');
+                row.className = 'accordion-row bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden mb-3';
+                row.innerHTML = `<div class="px-5 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4 flex-1 w-full cursor-pointer" onclick="this.parentElement.parentElement.classList.toggle('active')">
+                            <div class="w-1.5 h-10 sm:h-6 rounded-full ${window.getStatusColorBg(item.status)}"></div>
+                            <div class="flex-1"><h4 class="font-bold text-slate-800 text-base leading-tight">${item.name} <span class="ml-2 text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-500 font-black uppercase">${item.coord || 'N/A'}</span></h4></div>
+                        </div><div class="flex items-center gap-6"><div class="text-right"><p class="text-[10px] font-black text-slate-400 uppercase">Prazo</p><p class="text-sm font-bold text-slate-700">${item.prazo ? new Date(item.prazo + "T00:00:00").toLocaleDateString('pt-BR') : '--'}</p></div>
+                        <button onclick="editItem('${item.id}')" class="w-9 h-9 rounded-lg bg-slate-50 text-slate-400 hover:text-blue-600 flex items-center justify-center"><i class="fas fa-edit text-sm"></i></button><i class="fas fa-chevron-down text-slate-300 chevron-icon transition-transform text-xs"></i></div></div>
+                    <div class="accordion-content px-5 sm:px-12 bg-slate-50/50"><div class="py-6 space-y-4"><div class="grid grid-cols-1 lg:grid-cols-3 gap-6"><div class="lg:col-span-2 space-y-4">
+                        
+                        <!-- Bloco Descrição -->
+                        <div><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Descrição / Escopo</p><p class="text-sm text-slate-700 leading-relaxed">${item.desc || 'Sem descrição.'}</p></div>
+                        
+                        <!-- Bloco Riscos (NOVO VISUAL NO CARD) -->
+                        ${item.risks ? `<div class="bg-red-50 p-3 rounded-xl border border-red-100"><p class="text-[10px] font-black text-red-500 uppercase mb-1"><i class="fas fa-exclamation-triangle mr-1"></i> Riscos / Impedimentos</p><p class="text-xs text-red-700 leading-relaxed font-bold">${item.risks}</p></div>` : ''}
+
+                        <!-- Bloco Observações (NOVO) -->
+                        ${item.obs ? `<div class="pt-2"><p class="text-[10px] font-black text-slate-400 uppercase mb-1">Observações Gerais</p><p class="text-xs text-slate-600 leading-relaxed bg-amber-50 p-2 rounded border border-amber-100">${item.obs}</p></div>` : ''}
+
+                        ${roadmapHtml}
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white p-3 rounded-xl border border-slate-100"><p class="text-[10px] font-black text-slate-400 uppercase mb-2">Status</p><span class="text-[11px] font-black uppercase px-2 py-1 rounded-lg ${window.getStatusColor(item.status)} block w-full text-center">${item.status}</span></div>
+                        
+                        <div class="bg-white p-3 rounded-xl border border-slate-100 space-y-3">
+                            <!-- Gestor -->
+                            ${item.manager ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Gestor</p><p class="text-xs font-bold text-slate-700">${item.manager}</p></div>` : ''}
+                            
+                            <!-- SEI (NOVO) -->
+                            ${item.sei ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Processo SEI</p><p class="text-xs font-bold text-slate-700 bg-slate-100 px-1 rounded inline-block">${item.sei}</p></div>` : ''}
+
+                            <!-- Campos Específicos (Contrato/Operacional) -->
+                            ${item.type ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Tipo</p><p class="text-xs font-bold text-purple-700">${item.type}</p></div>` : ''}
+                            ${item.service ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Serviço</p><p class="text-xs font-bold text-orange-700">${item.service}</p></div>` : ''}
+                            ${item.resourceValue ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Valor</p><p class="text-xs font-black text-emerald-600">R$ ${item.resourceValue}</p></div>` : ''}
+                            ${item.duration ? `<div><p class="text-[9px] font-black text-slate-400 uppercase">Duração</p><p class="text-xs font-bold text-slate-700">${item.duration} dias</p></div>` : ''}
+
+                            <!-- Atores -->
+                            ${item.actors && item.actors.length ? `<div class="pt-2 border-t border-slate-50 mt-2"><p class="text-[9px] font-black text-slate-400 uppercase mb-1">Atores</p><div class="flex flex-wrap gap-1">${item.actors.map(a => `<span class="bg-slate-100 text-slate-600 text-[10px] px-2 py-0.5 rounded font-bold border border-slate-200">${a}</span>`).join('')}</div></div>` : ''}
+                            
+                            <!-- Docs -->
+                            ${item.docLink ? `<div class="pt-2"><a href="${item.docLink}" target="_blank" class="text-[10px] font-bold text-blue-500 hover:underline flex items-center gap-1"><i class="fas fa-external-link-alt"></i> Docs</a></div>` : ''}
+                        </div>
+                    </div></div></div></div>`;
+                container.appendChild(row);
+            });
+        };
+
+        window.changeMonth = (offset) => { 
+            currentDate.setMonth(currentDate.getMonth() + offset); 
+            selectedCalendarDay = null; // Reseta o filtro ao mudar o mês
+            window.renderCalendar(); 
+        };
+
+        // Função para filtrar por dia específico
+        window.filterCalendarByDay = (dateStr) => {
+            selectedCalendarDay = dateStr;
+            window.renderCalendar();
+        };
+        
+        // --- FUNÇÃO RENDER CALENDAR ATUALIZADA ---
+        window.renderCalendar = () => {
+            const grid = document.getElementById('calendarGrid');
+            const lc = document.getElementById('calendarEventsList');
+            const clearBtn = document.getElementById('clearDayFilterBtn');
+            const listTitle = document.getElementById('eventListTitle');
+
+            if(!grid || !lc) return; 
+            grid.innerHTML = '';
+            
+            const y = currentDate.getFullYear(), m = currentDate.getMonth();
+            const mn = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            document.getElementById('calMonthName').innerText = mn[m]; 
+            document.getElementById('calYearName').innerText = y;
+            
+            // Controle do botão de limpar filtro e título
+            if (selectedCalendarDay) {
+                clearBtn.classList.remove('hidden');
+                const [dYear, dMonth, dDay] = selectedCalendarDay.split('-');
+                listTitle.innerText = `Eventos em ${dDay}/${dMonth}/${dYear}`;
+            } else {
+                clearBtn.classList.add('hidden');
+                listTitle.innerText = 'Detalhamento de Eventos';
+            }
+            
+            const fd = new Date(y, m, 1).getDay();
+            const dim = new Date(y, m + 1, 0).getDate();
+            
+            // Células vazias iniciais
+            for(let i=0; i<fd; i++) grid.appendChild(Object.assign(document.createElement('div'), {className: 'calendar-new-day-empty'}));
+            
+            // Função auxiliar de filtro (Coordenação/Área)
+            const filterItem = (item) => {
+                if (currentFilter === 'all') return true;
+                const itemCoord = item.coord || item.area; 
+                return itemCoord === currentFilter;
+            };
+
+            let monthEvts = []; // Todos os eventos do mês (respeitando filtro de coordenação)
+            let filteredListEvts = []; // Eventos que serão mostrados na lista (pode ser mês inteiro ou só dia selecionado)
+
+            for(let d=1; d<=dim; d++) {
+                const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const cell = Object.assign(document.createElement('div'), {className: 'calendar-new-day-cell'});
+                
+                // Highlight dia atual
+                const today = new Date(); 
+                if(d === today.getDate() && m === today.getMonth() && y === today.getFullYear()) {
+                    cell.classList.add('calendar-day-active');
+                }
+
+                // Highlight dia selecionado pelo filtro
+                if (selectedCalendarDay === ds) {
+                    cell.classList.add('!bg-blue-50', '!border-blue-400', '!ring-2', '!ring-blue-200');
+                }
+
+                cell.innerHTML = `<span class="text-[10px] font-bold text-slate-400 p-1 block text-right">${d}</span>`;
+                
+                let dayEvts = [];
+                
+                // Coleta eventos
+                ['projects', 'contracts', 'operational'].forEach(s => {
+                    dataStore[s]?.forEach(i => { 
+                        if(i.prazo === ds && filterItem(i)) dayEvts.push({...i, origin: s});
+                    });
+                });
+                dataStore.calendarEvents.forEach(e => { 
+                    if(e.prazo === ds && filterItem(e)) dayEvts.push({...e, origin: 'general'});
+                });
+                
+                // Adiciona ao acumulado do mês
+                monthEvts = [...monthEvts, ...dayEvts];
+                
+                // Se este dia for o selecionado, adiciona à lista filtrada
+                if (selectedCalendarDay === ds) {
+                    filteredListEvts = [...dayEvts];
+                }
+
+                // Renderiza o badge de contagem (AGORA CLICÁVEL)
+                if(dayEvts.length > 0) {
+                    cell.innerHTML += `
+                        <div class="mt-2 text-center" onclick="filterCalendarByDay('${ds}')">
+                            <span class="bg-blue-50 text-blue-600 border border-blue-100 rounded-md py-0.5 px-2 text-[9px] font-black uppercase inline-block w-full truncate cursor-pointer hover:bg-blue-100 hover:border-blue-300 transition-colors">
+                                ${dayEvts.length} eventos
+                            </span>
+                        </div>`;
+                }
+                
+                grid.appendChild(cell);
+            }
+            
+            // Lógica final da lista: Se não tem dia selecionado, mostra tudo. Se tem, mostra só o dia filtrado.
+            const listData = selectedCalendarDay ? filteredListEvts : monthEvts;
+            
+            lc.innerHTML = listData.length === 0 
+                ? `<p class="text-slate-400 text-xs italic text-center py-4">Nenhum evento ${selectedCalendarDay ? 'neste dia' : 'para este filtro'}.</p>` 
+                : listData.sort((a,b) => a.prazo.localeCompare(b.prazo)).map(e => {
+                    const colors = { projects: 'bg-blue-500', contracts: 'bg-purple-500', operational: 'bg-orange-500', general: 'bg-green-500' };
+                    // Formata data para exibição
+                    const [eY, eM, eD] = e.prazo.split('-');
+                    
+                    return `<div class="flex items-center gap-4 p-3 rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer" onclick="origin === 'general' ? openCalendarModal(e) : editItem('${e.id}', '${e.origin}')">
+                        <div class="flex-none w-12 text-center"><span class="block text-xs font-black text-slate-700">${eD}/${eM}</span></div>
+                        <div class="w-1.5 h-8 rounded-full ${colors[e.origin]}"></div>
+                        <div class="flex-1">
+                            <p class="text-xs font-bold text-slate-800">${e.name}</p>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase">${e.coord || e.area || 'Geral'}</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                    </div>`;
+            }).join('');
+        };
+
+        window.openCalendarModal = (e = null) => {
+            const sel = document.getElementById('calEventArea'); if(sel.options.length === 0) sel.innerHTML = areasList.map(a => `<option value="${a}">${a}</option>`).join('');
+            if(e) { document.getElementById('calEventId').value = e.id; document.getElementById('calEventName').value = e.name; document.getElementById('calEventArea').value = e.area; document.getElementById('calEventDate').value = e.prazo; document.getElementById('calEventObs').value = e.obs || ''; document.getElementById('btnDeleteEvent').classList.remove('hidden'); }
+            else { document.getElementById('calendarForm').reset(); document.getElementById('calEventId').value = ''; document.getElementById('calEventDate').valueAsDate = new Date(); document.getElementById('btnDeleteEvent').classList.add('hidden'); }
+            toggleModal('calendarModal');
+        };
+
+        window.saveCalendarEvent = async () => {
+            const id = document.getElementById('calEventId').value || Date.now().toString();
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'calendar_events', id), { name: document.getElementById('calEventName').value, area: document.getElementById('calEventArea').value, prazo: document.getElementById('calEventDate').value, obs: document.getElementById('calEventObs').value });
+            toggleModal('calendarModal');
+        };
+
+        window.deleteCalendarEvent = async () => { const id = document.getElementById('calEventId').value; if(id) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'calendar_events', id)); toggleModal('calendarModal'); };
+        window.getStatusColorBg = s => ({"Backlog":"bg-slate-300","Iniciado":"bg-sky-400","Em Planejamento":"bg-indigo-500","Em Execução (Dentro do Planejado)":"bg-green-500","Em Execução (Atenção)":"bg-amber-400","Em Execução (Em Risco / Atrasado)":"bg-orange-500","Crítico":"bg-red-600","Concluído":"bg-emerald-600"}[s] || "bg-slate-200");
+        window.getStatusColor = s => (s === "Concluído" || s.includes("Dentro") ? "text-green-600 bg-green-50 border-green-200" : (s === "Crítico" || s.includes("Risco") ? "text-red-600 bg-red-50 border-red-200" : (s.includes("Atenção") ? "text-amber-600 bg-amber-50 border-amber-200" : "text-slate-600 bg-slate-50 border-slate-200")));
+        window.setListFilter = f => { currentListFilter = f; document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-filter')); const map = {'all':'cardTotal','Backlog':'cardBacklog','Iniciado':'cardIniciado','Em Planejamento':'cardPlanejado','Em Execução (Dentro do Planejado)':'cardExecDP','Em Execução (Atenção)':'cardExecEA','Em Execução (Em Risco / Atrasado)':'cardExecRA','Crítico':'cardCritico','Concluído':'cardConcluido'}; if(map[f]) document.getElementById(map[f]).classList.add('active-filter'); window.renderData(); };
+        
+        window.setPriorityFilter = p => { 
+            currentPriorityFilter = (currentPriorityFilter === p) ? 'all' : p; 
+            
+            document.querySelectorAll('[id^="legend-prio-"]').forEach(el => el.classList.remove('active-legend'));
+            if(currentPriorityFilter !== 'all') {
+                const map = {'Urgente':'urg', 'Alta':'high', 'Média':'mid', 'Baixa':'low'};
+                document.getElementById('legend-prio-'+map[currentPriorityFilter]).classList.add('active-legend');
+            }
+            
+            window.renderData(); 
+        };
+        
+        window.setFilter = f => { currentFilter = f; const btns = document.querySelectorAll('.coord-btn'); btns.forEach(b => b.classList.remove('active-coord')); if(f !== 'all') { document.getElementById('coordBtnContainer').classList.add('coord-list-active'); const b = document.getElementById('coord-'+f); if(b) b.classList.add('active-coord'); } else document.getElementById('coordBtnContainer').classList.remove('coord-list-active'); window.renderData(); };
+        window.updateStatusUI = s => { document.getElementById('sysStatusDot').className = `w-2 h-2 rounded-full ${s === 'online' ? 'bg-emerald-400' : 'bg-amber-400'}`; document.getElementById('sysStatusText').innerText = s === 'online' ? 'Online' : 'Sincronizando...'; };
+        
+        onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
                 initListeners();
-                switchTab('projects');
-                document.getElementById('actorInput').addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') {
+                setTimeout(() => window.switchTab('projects'), 500); 
+                
+                const actorInput = document.getElementById('actorInput');
+                actorInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === ',') {
                         e.preventDefault();
-                        if(this.value.trim()) {
-                            const t = document.createElement('div'); t.className = 'actor-tag'; t.innerHTML = `<span>${this.value}</span><i class="fas fa-times cursor-pointer" onclick="this.parentElement.remove()"></i>`;
-                            document.getElementById('actorsTagContainer').insertBefore(t, this); this.value = '';
+                        const val = this.value.trim().replace(',', '');
+                        if(val) {
+                            const tag = document.createElement('div');
+                            tag.className = 'actor-tag';
+                            tag.innerHTML = `<span>${val}</span><i class="fas fa-times cursor-pointer hover:text-blue-800" onclick="this.parentElement.remove()"></i>`;
+                            document.getElementById('actorsTagContainer').insertBefore(tag, this);
+                            this.value = '';
                         }
                     }
                 });
-                const sel = document.getElementById('calEventArea'); 
-                if(sel.options.length === 0) sel.innerHTML = areasList.map(a => `<option value="${a}">${a}</option>`).join('');
             }
         });
 
