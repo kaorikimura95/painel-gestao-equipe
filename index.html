@@ -2282,6 +2282,24 @@ document.getElementById('projRisks').value = '';
                 }
             }
             if(currentListFilter !== 'all') filtered = filtered.filter(i => i.status === currentListFilter);
+            // Ordenação de Projetos (PMG + Concluídos no final)
+            // Regra:
+            // 1) Projetos NÃO concluídos primeiro
+            // 2) Dentro disso, ordena por PMG (G=Alta, M=Média, P=Baixa)
+            // 3) Desempate por nome
+            if (activeTab === 'projects') {
+                const pmgOrder = { 'Alta': 0, 'Média': 1, 'Baixa': 2 };
+                const isDone = (it) => (it && it.status === 'Concluído');
+                filtered = [...filtered].sort((a, b) => {
+                    const da = isDone(a), db = isDone(b);
+                    if (da !== db) return da ? 1 : -1;
+                    const oa = pmgOrder[a?.complexity] ?? 99;
+                    const ob = pmgOrder[b?.complexity] ?? 99;
+                    if (oa !== ob) return oa - ob;
+                    return (a?.name || '').localeCompare((b?.name || ''), 'pt-BR', { sensitivity: 'base' });
+                });
+            }
+
             
             // ... (Lógica charts status mantida) ...
             const total = filtered.length || 1;
